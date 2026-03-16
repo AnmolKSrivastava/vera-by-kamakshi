@@ -1,0 +1,56 @@
+/* src/components/common/ErrorMessage.css */
+
+.error-message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  min-height: 300px;
+}
+
+.error-icon {
+  color: #dc3545;
+  margin-bottom: 1.5rem;
+}
+
+.error-icon svg {
+  width: 64px;
+  height: 64px;
+}
+
+.error-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.error-text {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.error-retry-btn {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.error-retry-btn:hover {
+  background-color: #555;
+}
+
+.error-retry-btn:active {
+  transform: scale(0.98);
+}

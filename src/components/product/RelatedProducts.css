@@ -1,0 +1,45 @@
+/* src/components/product/RelatedProducts.css */
+
+.related-products {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 2px solid #e0d5cf;
+}
+
+.related-products-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: #2E2B28;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.related-products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .related-products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .related-products {
+    margin-top: 3rem;
+    padding-top: 2rem;
+  }
+  
+  .related-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .related-products-grid {
+    grid-template-columns: 1fr;
+  }
+}

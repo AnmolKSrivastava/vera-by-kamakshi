@@ -1,0 +1,190 @@
+/* src/components/product/ProductTabs.css */
+
+.product-tabs {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.tabs-header {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e0d5cf;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-bottom: 3px solid transparent;
+  position: relative;
+  bottom: -2px;
+}
+
+.tab-button:hover {
+  color: #2E2B28;
+}
+
+.tab-button.active {
+  color: #2E2B28;
+  border-bottom-color: #7a5c4d;
+  font-weight: 600;
+}
+
+.tabs-content {
+  padding: 2rem 0;
+}
+
+.tab-panel {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-panel h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  color: #2E2B28;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.tab-panel h4:first-child {
+  margin-top: 0;
+}
+
+.tab-panel p {
+  color: #666;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.tab-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.tab-panel ul li {
+  color: #666;
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.tab-panel ul li:before {
+  content: "•";
+  color: #7a5c4d;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+.feature-list {
+  background: #f9f9f9;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.specifications-list {
+  background: #ffffff;
+  border: 1px solid #e0d5cf;
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.specifications-list li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.specifications-list li:last-child {
+  border-bottom: none;
+}
+
+.specifications-list li:before {
+  content: "";
+}
+
+.specifications-list strong {
+  color: #2E2B28;
+  min-width: 140px;
+  display: inline-block;
+}
+
+.materials-subtitle {
+  margin-top: 2rem !important;
+}
+
+.care-instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.care-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.care-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.care-item strong {
+  color: #2E2B28;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.care-item p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.craftsmanship-note,
+.policy-note {
+  background: #FDF5F2;
+  border-left: 4px solid #7a5c4d;
+  padding: 1rem 1.5rem;
+  margin-top: 1rem;
+  border-radius: 4px;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .tab-button {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .tabs-content {
+    padding: 1.5rem 0;
+  }
+  
+  .care-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

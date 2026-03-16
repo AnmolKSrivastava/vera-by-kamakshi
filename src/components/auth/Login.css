@@ -1,0 +1,123 @@
+.login-error {
+  color: #C48E82;
+  background: #fff0ee;
+  border: 1px solid #D9A79C;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-family: 'Playfair Display', serif;
+}
+.login-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(44, 43, 40, 0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-modal {
+  background: none;
+  border: none;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.login-close-btn {
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  background: #fff;
+  color: #2E2B28;
+  border: 2px solid #D9A79C;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1.7rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(44, 43, 40, 0.08);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+.login-close-btn:hover, .login-close-btn:focus {
+  background: #D9A79C;
+  color: #fff;
+}
+.login-container {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FDF5F2;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(44, 43, 40, 0.08);
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 350px;
+  width: 100%;
+}
+
+.login-card h2 {
+  font-family: 'Playfair Display', serif;
+  color: #2E2B28;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.google-login-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: #D9A79C;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1.1rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(44, 43, 40, 0.04);
+}
+.google-login-btn:hover, .google-login-btn:focus {
+  background: #C48E82;
+}
+
+.google-logo {
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 600px) {
+  .login-card {
+    padding: 1.5rem 0.7rem 1.2rem 0.7rem;
+    max-width: 95vw;
+  }
+  .login-card h2 {
+    font-size: 1.3rem;
+  }
+  .google-login-btn {
+    font-size: 1rem;
+    padding: 0.6rem 1rem;
+  }
+}

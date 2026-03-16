@@ -1,0 +1,79 @@
+.wishlist-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.wishlist-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.wishlist-icon-btn:hover {
+  background: rgba(196, 142, 130, 0.1);
+  transform: scale(1.1);
+}
+
+.heart-icon {
+  transition: all 0.3s ease;
+}
+
+.wishlist-icon-btn:hover .heart-icon {
+  stroke: #a67368;
+  fill: rgba(196, 142, 130, 0.2);
+}
+
+.wishlist-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: linear-gradient(135deg, #ef5350, #e53935);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 6px rgba(239, 83, 80, 0.4);
+  animation: wishlistBadgePulse 0.4s ease-out;
+}
+
+@keyframes wishlistBadgePulse {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .wishlist-icon-btn {
+    padding: 0.4rem;
+  }
+
+  .wishlist-badge {
+    font-size: 0.6rem;
+    min-width: 16px;
+    height: 16px;
+  }
+}
