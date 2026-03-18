@@ -25,7 +25,7 @@
 .form-section-title {
   font-size: 1.1rem;
   font-weight: 500;
-  color: #bfa074;
+  color: #030213;
   margin-top: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid rgba(191,160,116,0.3);
@@ -68,7 +68,7 @@
   font-size: 1rem;
   background: #fff;
   color: #2E2B28;
-  transition: all 0.2s;
+  transition: all 0.5s;
   font-family: inherit;
 }
 
@@ -76,7 +76,7 @@
 .add-product-form select:focus,
 .add-product-form textarea:focus {
   outline: none;
-  border-color: #bfa074;
+  border-color: #030213;
   box-shadow: 0 0 0 3px rgba(191,160,116,0.1);
 }
 
@@ -131,7 +131,7 @@
 }
 
 .file-input:hover {
-  border-color: #bfa074;
+  border-color: #030213;
   background: #fff;
 }
 
@@ -170,7 +170,7 @@
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #bfa074;
+  accent-color: #030213;
 }
 
 /* Color Input Styling */
@@ -208,7 +208,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: background 0.5s;
   font-weight: 500;
 }
 
@@ -219,37 +219,37 @@
 .add-color-btn {
   margin-top: 0.5rem;
   padding: 0.6rem 1.2rem;
-  background: #bfa074;
+  background: #030213;
   color: #fff;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
   font-weight: 500;
-  transition: background 0.2s;
+  transition: background 0.5s;
   font-size: 0.95rem;
 }
 
 .add-color-btn:hover {
-  background: #a88c5f;
+  background: #030213;
 }
 
 /* Submit Button */
 .add-product-btn {
   margin-top: 1.5rem;
   padding: 0.9rem 0;
-  background: linear-gradient(135deg, #bfa074, #9d8560);
+  background: #030213;
   color: #fff;
   border: none;
   border-radius: 0.5rem;
   font-size: 1.1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.5s;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .add-product-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #a88c5f, #8b7449);
+  background: #030213;
   transform: translateY(-2px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
@@ -314,7 +314,7 @@
   padding: 1rem 2rem;
   cursor: pointer;
   font-size: 1.1rem;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .admin-nav li.active,
@@ -413,7 +413,7 @@
 
 .products-table tbody tr {
   border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .products-table tbody tr:hover {
@@ -445,7 +445,7 @@
   border-radius: 50%;
   border: 2px solid #e0e0e0;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.5s;
 }
 
 .color-dot:hover {
@@ -464,17 +464,17 @@
   border-radius: 0.4rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.5s;
   font-size: 0.9rem;
 }
 
 .edit-btn {
-  background: #bfa074;
+  background: #030213;
   color: #fff;
 }
 
 .edit-btn:hover {
-  background: #a88c5f;
+  background: #030213;
 }
 
 .delete-btn {
@@ -528,7 +528,7 @@
 }
 
 .stat-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 1rem;
   padding: 1.5rem;
   display: flex;
@@ -536,7 +536,7 @@
   gap: 1rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(191,160,116,0.2);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.5s, box-shadow 0.2s;
 }
 
 .stat-card:hover {
@@ -718,7 +718,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.5s, color 0.2s;
 }
 
 .modal-close:hover {
@@ -814,7 +814,7 @@
   border-radius: 0.5rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .btn-cancel:hover {
@@ -823,17 +823,17 @@
 
 .btn-save {
   padding: 0.7rem 1.5rem;
-  background: #bfa074;
+  background: #030213;
   color: #fff;
   border: none;
   border-radius: 0.5rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .btn-save:hover {
-  background: #a88c5f;
+  background: #030213;
 }
 
 .btn-delete-confirm {
@@ -844,7 +844,7 @@
   border-radius: 0.5rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .btn-delete-confirm:hover {
@@ -920,14 +920,14 @@
 
 .btn-create-coupon {
   padding: 0.8rem 2rem;
-  background: #bfa074;
+  background: #030213;
   color: #fff;
   border: none;
   border-radius: 0.5rem;
   font-size: 1.1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.5s;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -935,7 +935,7 @@
 }
 
 .btn-create-coupon:hover {
-  background: #a88c5f;
+  background: #030213;
 }
 
 .coupons-list-container h2 {
@@ -952,11 +952,11 @@
 }
 
 .coupon-card {
-  background: linear-gradient(135deg, rgba(191, 160, 116, 0.1), rgba(255, 255, 255, 0.9));
-  border: 2px dashed #bfa074;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px dashed #030213;
   border-radius: 0.75rem;
   padding: 1.5rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.5s, box-shadow 0.2s;
 }
 
 .coupon-card:hover {
@@ -975,7 +975,7 @@
   font-size: 1.3rem;
   font-weight: 500;
   font-family: 'Courier New', monospace;
-  color: #bfa074;
+  color: #030213;
   letter-spacing: 0.08em;
 }
 
@@ -991,7 +991,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .delete-coupon-btn:hover {
@@ -1026,7 +1026,7 @@
 }
 
 .logs-table thead {
-  background: linear-gradient(135deg, #bfa074, #9d8560);
+  background: #030213;
   color: #fff;
 }
 
@@ -1039,7 +1039,7 @@
 
 .logs-table tbody tr {
   border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .logs-table tbody tr:hover {
@@ -1109,7 +1109,7 @@
 }
 
 .users-table thead {
-  background: linear-gradient(135deg, #bfa074, #9d8560);
+  background: #030213;
   color: #fff;
 }
 
@@ -1122,7 +1122,7 @@
 
 .users-table tbody tr {
   border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .users-table tbody tr:hover {
@@ -1215,14 +1215,14 @@
 }
 
 .metric-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.5s, box-shadow 0.3s;
 }
 
 .metric-card:hover {
@@ -1244,7 +1244,7 @@
 .metric-value {
   font-size: 2rem;
   font-weight: 500;
-  color: #8b7355;
+  color: #030213;
   font-family: 'Playfair Display', serif;
   line-height: 1.2;
 }
@@ -1306,7 +1306,7 @@
 }
 
 .performance-table thead {
-  background: linear-gradient(135deg, #bfa074, #9d8560);
+  background: #030213;
   color: #fff;
 }
 
@@ -1319,7 +1319,7 @@
 
 .performance-table tbody tr {
   border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .performance-table tbody tr:hover {
@@ -1371,7 +1371,7 @@
 }
 
 .inventory-stat {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
@@ -1388,7 +1388,7 @@
 .inventory-stat .stat-number {
   font-size: 2.5rem;
   font-weight: 500;
-  color: #8b7355;
+  color: #030213;
   font-family: 'Playfair Display', serif;
   margin: 0;
 }
@@ -1442,7 +1442,7 @@
 }
 
 .bulk-update-table thead {
-  background: linear-gradient(135deg, #bfa074, #9d8560);
+  background: #030213;
   color: #fff;
   position: sticky;
   top: 0;
@@ -1458,7 +1458,7 @@
 
 .bulk-update-table tbody tr {
   border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .bulk-update-table tbody tr:hover {
@@ -1476,12 +1476,12 @@
   border-radius: 0.4rem;
   width: 80px;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: border-color 0.5s;
 }
 
 .stock-input:focus {
   outline: none;
-  border-color: #bfa074;
+  border-color: #030213;
 }
 
 .change-indicator {
@@ -1508,7 +1508,7 @@
 }
 
 .btn-update-stock {
-  background: linear-gradient(135deg, #28a745, #20873a);
+  background: #030213;
   color: white;
   border: none;
   padding: 0.8rem 2rem;
@@ -1516,7 +1516,7 @@
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.5s;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
@@ -1538,7 +1538,7 @@
 }
 
 .stock-history-table thead {
-  background: linear-gradient(135deg, #bfa074, #9d8560);
+  background: #030213;
   color: #fff;
 }
 
@@ -1589,7 +1589,7 @@
   padding: 1.5rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   border-left: 4px solid;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.5s, box-shadow 0.2s;
 }
 
 .alert-card.warning {
@@ -1655,7 +1655,7 @@
 .btn-quick-restock {
   width: 100%;
   margin-top: 1rem;
-  background: linear-gradient(135deg, #8b7355, #6f5c44);
+  background: #030213;
   color: white;
   border: none;
   padding: 0.7rem;
@@ -1663,7 +1663,7 @@
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.5s;
 }
 
 .btn-quick-restock:hover {

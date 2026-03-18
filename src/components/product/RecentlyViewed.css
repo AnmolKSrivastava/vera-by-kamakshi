@@ -3,8 +3,8 @@
 .recently-viewed {
   margin: 4rem 0;
   padding: 3rem 0;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-  border-radius: 12px;
+  background: #f8f9fa;
+  border-radius: 0;
 }
 
 .recently-viewed-header {

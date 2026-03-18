@@ -1,34 +1,43 @@
 /* Content Pages - Shared Styles for About, Contact, Policies, FAQ */
 
 .content-page {
-  min-height: 80vh;
-  padding: 80px 0 60px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  min-height: calc(100vh - 180px);
+  padding: 5rem 1.5rem 2rem 1.5rem;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: center;
 }
 
 .content-container {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+  width: 100%;
+  background: #ffffff;
+  padding: 3rem 2.5rem;
+  border-radius: 0;
+  box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.07);
+  margin: 24px auto;
 }
 
 /* Page Title */
 .page-title {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 500;
-  color: #2c3e50;
+  color: #030213;
   text-align: center;
-  margin-bottom: 20px;
-  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .page-intro {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: #555;
   text-align: center;
   max-width: 800px;
-  margin: 0 auto 50px;
+  margin: 0 auto 3rem;
   line-height: 1.8;
+  border-bottom: 3px solid #030213;
+  padding-bottom: 2rem;
 }
 
 /* Content Sections */
@@ -36,9 +45,9 @@
   background: white;
   padding: 40px;
   margin-bottom: 30px;
-  border-radius: 12px;
+  border-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.5s ease;
 }
 
 .content-section:hover {
@@ -50,7 +59,7 @@
   font-weight: 500;
   color: #2c3e50;
   margin-bottom: 20px;
-  border-bottom: 3px solid #d4a574;
+  border-bottom: 3px solid #030213;
   padding-bottom: 10px;
 }
 
@@ -89,14 +98,14 @@
 }
 
 .content-section a {
-  color: #d4a574;
+  color: #030213;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: color 0.5s ease;
 }
 
 .content-section a:hover {
-  color: #b8935f;
+  color: #2c2c2c;
   text-decoration: underline;
 }
 
@@ -119,7 +128,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  background: #d4a574;
+  background: #030213;
   color: white;
   width: 28px;
   height: 28px;
@@ -134,14 +143,14 @@
 /* Note Section */
 .note-section {
   background: #fff8f0;
-  border-left: 4px solid #d4a574;
+  border-left: 4px solid #030213;
 }
 
 .note {
   background: #f8f9fa;
   padding: 15px 20px;
-  border-radius: 8px;
-  border-left: 4px solid #d4a574;
+  border-radius: 0;
+  border-left: 4px solid #030213;
   margin: 15px 0;
 }
 
@@ -157,9 +166,9 @@
   text-align: center;
   padding: 40px 30px;
   background: white;
-  border-radius: 12px;
+  border-radius: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
 .value-card:hover {
@@ -196,8 +205,8 @@
 .feature-list li {
   background: #f8f9fa;
   padding: 20px;
-  border-radius: 8px;
-  border-left: 4px solid #d4a574;
+  border-radius: 0;
+  border-left: 4px solid #030213;
   list-style: none;
 }
 
@@ -205,8 +214,8 @@
 .cta-section {
   text-align: center;
   padding: 60px 40px;
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  border-radius: 12px;
+  background: #030213;
+  border-radius: 0;
   color: white;
   margin-top: 40px;
 }
@@ -229,20 +238,22 @@
   font-size: 1.1rem;
   font-weight: 500;
   text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: 0;
+  transition: all 0.5s ease;
   display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
 }
 
 .btn-primary {
-  background: #d4a574;
+  background: #030213;
   color: white;
-  border: 2px solid #d4a574;
+  border: 2px solid #030213;
 }
 
 .btn-primary:hover {
-  background: #b8935f;
-  border-color: #b8935f;
+  background: #2c2c2c;
+  border-color: #2c2c2c;
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -255,7 +266,7 @@
 
 .btn-secondary:hover {
   background: white;
-  color: #2c3e50;
+  color: #030213;
   transform: translateY(-2px);
 }
 
@@ -270,7 +281,7 @@
 .contact-form-section {
   background: white;
   padding: 40px;
-  border-radius: 12px;
+  border-radius: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
@@ -307,8 +318,8 @@
   padding: 14px 18px;
   font-size: 1rem;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 0;
+  transition: border-color 0.5s ease, box-shadow 0.5s ease;
   font-family: inherit;
 }
 
@@ -316,8 +327,8 @@
 .contact-form select:focus,
 .contact-form textarea:focus {
   outline: none;
-  border-color: #d4a574;
-  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+  border-color: #030213;
+  box-shadow: 0 0 0 3px rgba(3, 2, 19, 0.1);
 }
 
 .contact-form textarea {
@@ -328,18 +339,20 @@
 .contact-form button[type="submit"] {
   width: 100%;
   padding: 16px;
-  background: #d4a574;
+  background: #030213;
   color: white;
   font-size: 1.1rem;
   font-weight: 500;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
 }
 
 .contact-form button[type="submit"]:hover {
-  background: #b8935f;
+  background: #2c2c2c;
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -348,7 +361,7 @@
   background: #d4edda;
   color: #155724;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 0;
   margin-bottom: 25px;
   border: 1px solid #c3e6cb;
   font-size: 1.05rem;
@@ -365,9 +378,9 @@
 .contact-info-card {
   background: white;
   padding: 30px;
-  border-radius: 12px;
+  border-radius: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
 .contact-info-card:hover {
@@ -377,7 +390,7 @@
 
 .contact-info-card .icon {
   font-size: 2rem;
-  color: #d4a574;
+  color: #030213;
   margin-bottom: 15px;
 }
 
@@ -396,14 +409,14 @@
 }
 
 .contact-info-card a {
-  color: #d4a574;
+  color: #030213;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: color 0.5s ease;
 }
 
 .contact-info-card a:hover {
-  color: #b8935f;
+  color: #2c2c2c;
   text-decoration: underline;
 }
 
@@ -411,7 +424,7 @@
 .social-links {
   background: white;
   padding: 30px;
-  border-radius: 12px;
+  border-radius: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   text-align: center;
 }
@@ -439,12 +452,12 @@
   border-radius: 50%;
   color: #2c3e50;
   font-size: 1.5rem;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   text-decoration: none;
 }
 
 .social-icons a:hover {
-  background: #d4a574;
+  background: #030213;
   color: white;
   transform: translateY(-4px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
@@ -457,7 +470,7 @@
   margin: 25px 0;
   font-size: 1.05rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-radius: 8px;
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -475,7 +488,7 @@
 
 .policy-table tbody tr {
   border-bottom: 1px solid #e0e0e0;
-  transition: background 0.3s ease;
+  transition: background 0.5s ease;
 }
 
 .policy-table tbody tr:hover {
@@ -500,8 +513,8 @@
 .contact-info-box {
   background: #f8f9fa;
   padding: 25px 30px;
-  border-radius: 8px;
-  border-left: 4px solid #d4a574;
+  border-radius: 0;
+  border-left: 4px solid #030213;
   margin: 20px 0;
 }
 
@@ -534,7 +547,7 @@
   color: #2c3e50;
   margin-bottom: 25px;
   padding-bottom: 12px;
-  border-bottom: 3px solid #d4a574;
+  border-bottom: 3px solid #030213;
 }
 
 .faq-list {
@@ -545,10 +558,10 @@
 
 .faq-item {
   background: white;
-  border-radius: 10px;
+  border-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.5s ease;
 }
 
 .faq-item:hover {
@@ -572,7 +585,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: background 0.3s ease;
+  transition: background 0.5s ease;
 }
 
 .faq-question:hover {
@@ -581,16 +594,16 @@
 
 .faq-item.active .faq-question {
   background: #f8f9fa;
-  color: #d4a574;
+  color: #030213;
 }
 
 .faq-toggle {
   font-size: 1.8rem;
   font-weight: 300;
-  color: #d4a574;
+  color: #030213;
   flex-shrink: 0;
   margin-left: 15px;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease;
 }
 
 .faq-item.active .faq-toggle {
@@ -624,7 +637,7 @@
 .faq-cta {
   text-align: center;
   padding: 50px 40px;
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  background: #030213;
   color: white;
   margin-top: 60px;
 }
@@ -654,8 +667,8 @@
   font-size: 1.05rem;
   font-weight: 500;
   text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: 0;
+  transition: all 0.5s ease;
   display: inline-block;
 }
 

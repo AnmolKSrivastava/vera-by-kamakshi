@@ -1202,7 +1202,7 @@ const AdminDashboard = () => {
                     <YAxis yAxisId="right" orientation="right" />
                     <Tooltip />
                     <Legend />
-                    <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="#8b7355" strokeWidth={2} name="Revenue (₹)" />
+                    <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="#030213" strokeWidth={2} name="Revenue (₹)" />
                     <Line yAxisId="right" type="monotone" dataKey="orders" stroke="#82ca9d" strokeWidth={2} name="Orders" />
                   </LineChart>
                 </ResponsiveContainer>
@@ -1225,7 +1225,7 @@ const AdminDashboard = () => {
                       label={(entry) => `${entry.name} (${entry.count})`}
                     >
                       {analyticsData.categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={['#8b7355', '#d4a574', '#e0c9a6', '#bfa589', '#9b8269', '#7f6a53'][index % 6]} />
+                        <Cell key={`cell-${index}`} fill={['#030213', '#2c2c2c', '#4a4a4a', '#666666', '#858585', '#a3a3a3'][index % 6]} />
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
@@ -1241,7 +1241,7 @@ const AdminDashboard = () => {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
-                    <Bar dataKey="value" fill="#8b7355" />
+                    <Bar dataKey="value" fill="#030213" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

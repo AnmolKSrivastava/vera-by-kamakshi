@@ -191,7 +191,7 @@
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s;
+  transition: all 0.5s;
 }
 
 .testimonial-card:hover {

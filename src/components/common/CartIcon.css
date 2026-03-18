@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: center;
   color: inherit;
-  transition: transform 0.2s;
+  transition: transform 0.5s;
 }
 
 .cart-icon-button:hover {

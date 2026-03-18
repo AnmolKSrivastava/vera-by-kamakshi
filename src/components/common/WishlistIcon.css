@@ -15,7 +15,7 @@
   justify-content: center;
   position: relative;
   border-radius: 50%;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 }
 
 .wishlist-icon-btn:hover {
@@ -24,7 +24,7 @@
 }
 
 .heart-icon {
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 }
 
 .wishlist-icon-btn:hover .heart-icon {
@@ -36,7 +36,7 @@
   position: absolute;
   top: 2px;
   right: 2px;
-  background: linear-gradient(135deg, #ef5350, #e53935);
+  background: #030213;
   color: white;
   font-size: 0.65rem;
   font-weight: 500;
@@ -47,7 +47,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 4px;
-  box-shadow: 0 2px 6px rgba(239, 83, 80, 0.4);
+  box-shadow: 0 2px 6px rgba(3, 2, 19, 0.4);
   animation: wishlistBadgePulse 0.4s ease-out;
 }
 

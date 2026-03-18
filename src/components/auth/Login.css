@@ -1,7 +1,7 @@
 .login-error {
-  color: #C48E82;
+  color: #030213;
   background: #fff0ee;
-  border: 1px solid #D9A79C;
+  border: 1px solid #2c2c2c;
   border-radius: 5px;
   padding: 0.5rem 1rem;
   margin-top: 1rem;
@@ -37,7 +37,7 @@
   right: -18px;
   background: #fff;
   color: #2E2B28;
-  border: 2px solid #D9A79C;
+  border: 2px solid #2c2c2c;
   border-radius: 50%;
   width: 36px;
   height: 36px;
@@ -49,10 +49,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.5s, color 0.2s;
 }
 .login-close-btn:hover, .login-close-btn:focus {
-  background: #D9A79C;
+  background: #2c2c2c;
   color: #fff;
 }
 .login-container {
@@ -87,7 +87,7 @@
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  background: #D9A79C;
+  background: #2c2c2c;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -96,11 +96,11 @@
   font-family: 'Playfair Display', serif;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.5s;
   box-shadow: 0 2px 8px rgba(44, 43, 40, 0.04);
 }
 .google-login-btn:hover, .google-login-btn:focus {
-  background: #C48E82;
+  background: #030213;
 }
 
 .google-logo {

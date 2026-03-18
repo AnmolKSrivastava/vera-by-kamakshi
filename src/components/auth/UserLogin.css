@@ -54,7 +54,7 @@
   font-size: 2rem;
   color: #999;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.5s;
   line-height: 1;
   padding: 0;
   width: 32px;
@@ -98,7 +98,7 @@
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.5s;
   color: #666;
   box-sizing: border-box;
   display: flex;
@@ -109,7 +109,7 @@
 
 .method-icon {
   flex-shrink: 0;
-  transition: transform 0.2s;
+  transition: transform 0.5s;
 }
 
 .method-btn:hover .method-icon {
@@ -189,7 +189,7 @@
   border: 2px solid #e0e0e0;
   border-radius: 0.6rem;
   font-size: 1rem;
-  transition: all 0.3s;
+  transition: all 0.5s;
   font-family: inherit;
   color: #2E2B28;
   box-sizing: border-box;
@@ -226,7 +226,7 @@
   font-size: 1.1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.5s;
   margin-bottom: 0.8rem;
   box-sizing: border-box;
 }
@@ -252,7 +252,7 @@
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.5s;
   box-sizing: border-box;
 }
 
@@ -280,7 +280,7 @@
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.5s;
   display: flex;
   align-items: center;
   justify-content: center;

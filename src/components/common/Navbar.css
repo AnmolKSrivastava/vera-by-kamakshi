@@ -8,7 +8,7 @@
   color: #2E2B28;
   padding: 0.45rem 1.2rem;
   border: 1.5px solid rgba(255,255,255,0.3);
-  border-radius: 30px;
+  border-radius: 0;
   font-size: 1rem;
   font-family: 'Playfair Display', serif;
   font-weight: 500;
@@ -17,7 +17,7 @@
   text-decoration: none;
   box-shadow: 0 2px 12px rgba(44, 43, 40, 0.07);
   backdrop-filter: blur(8px) saturate(120%);
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.22s cubic-bezier(.4,2,.6,1);
+  transition: background 0.5s, color 0.2s, box-shadow 0.2s, transform 0.22s cubic-bezier(.4,2,.6,1);
 }
 .login-btn:hover, .login-btn:focus {
   background: rgba(196, 142, 130, 0.8);
@@ -37,7 +37,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  transition: padding 0.3s ease, box-shadow 0.3s ease;
+  transition: padding 0.5s ease, box-shadow 0.3s ease;
   overflow: visible;
 }
 
@@ -82,12 +82,12 @@
   margin-bottom: 0.5rem;
   z-index: 1;
   text-decoration: none;
-  transition: transform 0.3s ease, color 0.3s ease;
+  transition: transform 0.5s ease, color 0.3s ease;
 }
 
 .navbar-logo:hover {
   transform: scale(1.05);
-  color: #C48E82;
+  color: #030213;
 }
 
 
@@ -128,7 +128,7 @@
   gap: 2rem;
   margin: 0;
   padding: 0;
-  transition: max-height 0.3s, opacity 0.3s;
+  transition: max-height 0.5s, opacity 0.3s;
 }
 .navbar-links-center {
   justify-content: center;
@@ -138,7 +138,7 @@
   color: #2E2B28;
   text-decoration: none;
   font-size: 1.1rem;
-  transition: color 0.3s ease;
+  transition: color 0.5s ease;
   font-weight: 500;
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
@@ -153,8 +153,8 @@
   transform: translateX(-50%);
   width: 0;
   height: 2px;
-  background: #C48E82;
-  transition: width 0.3s ease;
+  background: #030213;
+  transition: width 0.5s ease;
 }
 
 .navbar-links li a:hover::after {
@@ -162,7 +162,7 @@
 }
 
 .navbar-links li a.active {
-  color: #C48E82;
+  color: #030213;
   font-weight: 500;
 }
 
@@ -195,10 +195,10 @@
   gap: 0.5rem;
   background: rgba(217, 167, 156, 0.1);
   border: 1.5px solid rgba(196, 142, 130, 0.3);
-  border-radius: 30px;
+  border-radius: 0;
   padding: 0.4rem 1rem 0.4rem 0.4rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   font-family: 'Playfair Display', serif;
 }
 
@@ -216,7 +216,7 @@
 }
 
 .user-avatar-placeholder {
-  background: linear-gradient(135deg, #C48E82, #D9A79C);
+  background: #030213;
   color: white;
   display: flex;
   align-items: center;
@@ -237,7 +237,7 @@
 
 .dropdown-arrow {
   color: #2E2B28;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease;
 }
 
 .user-profile-btn:hover .dropdown-arrow {
@@ -280,7 +280,7 @@
 
 .dropdown-header {
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(196, 142, 130, 0.1), rgba(217, 167, 156, 0.1));
+  background: rgba(3, 2, 19, 0.1);
 }
 
 .dropdown-user-info {
@@ -322,7 +322,7 @@
   cursor: pointer;
   font-size: 0.95rem;
   font-family: 'Playfair Display', serif;
-  transition: background 0.2s ease;
+  transition: background 0.5s ease;
   text-decoration: none;
 }
 
@@ -363,7 +363,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   position: relative;
   z-index: 1001;
 }
@@ -374,7 +374,7 @@
 }
 
 .navbar-search-icon svg {
-  transition: stroke 0.3s ease;
+  transition: stroke 0.5s ease;
 }
 
 .navbar-search-icon:hover svg {
@@ -390,8 +390,8 @@
   display: flex;
   align-items: center;
   background: white;
-  border: 2px solid #C48E82;
-  border-radius: 30px;
+  border: 2px solid #030213;
+  border-radius: 0;
   padding: 0.4rem 0.6rem 0.4rem 1rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   animation: searchSlideIn 0.3s ease-out;
@@ -428,7 +428,7 @@
 }
 
 .navbar-search-btn {
-  background: linear-gradient(135deg, #C48E82, #D9A79C);
+  background: #030213;
   border: none;
   border-radius: 50%;
   width: 36px;
@@ -437,7 +437,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   flex-shrink: 0;
 }
 
@@ -568,7 +568,7 @@
     z-index: 999;
     opacity: 0;
     visibility: hidden;
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s;
+    transition: transform 0.5s ease-out, opacity 0.3s ease-out, visibility 0.3s;
   }
   
   .navbar-links.show {
@@ -593,7 +593,7 @@
     border-radius: 0;
     text-align: center !important;
     text-decoration: none;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.5s, color 0.2s;
     position: relative;
   }
   
@@ -602,15 +602,15 @@
   }
   
   .navbar-links li a.active {
-    background: rgba(196, 142, 130, 0.15);
-    color: #C48E82;
+    background: rgba(3, 2, 19, 0.05);
+    color: #030213;
     font-weight: 500;
   }
   
   .navbar-links li a:hover,
   .navbar-links li a:active {
     background: #f5f5f5;
-    color: #C48E82;
+    color: #030213;
   }
   
   /* Search on Mobile */

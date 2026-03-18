@@ -84,7 +84,7 @@ function SearchSuggestions({ searchTerm, onSelect }) {
                   <img src={product.imageUrl} alt={product.name} />
                 ) : (
                   <div className="suggestion-image-placeholder">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C48E82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#030213" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                       <circle cx="8.5" cy="8.5" r="1.5"></circle>
                       <polyline points="21 15 16 10 5 21"></polyline>
@@ -97,7 +97,7 @@ function SearchSuggestions({ searchTerm, onSelect }) {
                 <p className="suggestion-price">{formatPrice(product.price)}</p>
               </div>
               <svg className="suggestion-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M6 3L11 8L6 13" stroke="#C48E82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6 3L11 8L6 13" stroke="#030213" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </Link>
           ))}

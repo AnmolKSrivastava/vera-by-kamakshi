@@ -17,7 +17,7 @@
   padding: 1.25rem;
   overflow: hidden;
   cursor: zoom-in;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,7 +48,7 @@
   max-height: 380px;
   object-fit: contain;
   border-radius: 0.5rem;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s ease;
   display: block;
 }
 
@@ -66,7 +66,7 @@
   border-radius: 4px;
   font-size: 0.85rem;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.5s;
   pointer-events: none;
 }
 
@@ -89,7 +89,7 @@
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.5s;
   background: white;
   padding: 0;
 }

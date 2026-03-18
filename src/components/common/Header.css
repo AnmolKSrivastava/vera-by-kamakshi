@@ -9,7 +9,7 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 }
 
 .header-container {
@@ -41,11 +41,11 @@
   color: #2c2c2c;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: color 0.5s ease;
 }
 
 .header-logo:hover {
-  color: #8b7355;
+  color: #030213;
 }
 
 /* Desktop Navigation */
@@ -65,7 +65,7 @@
   text-transform: uppercase;
   color: #555;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.5s ease;
   font-weight: 400;
 }
 
@@ -92,11 +92,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.3s ease, transform 0.2s ease;
+  transition: color 0.5s ease, transform 0.5s ease;
 }
 
 .header-icon-btn:hover {
-  color: #8b7355;
+  color: #030213;
   transform: scale(1.05);
 }
 
@@ -132,16 +132,16 @@
 .header-search-submit {
   background: none;
   border: none;
-  color: #8b7355;
+  color: #030213;
   cursor: pointer;
   padding: 0.25rem;
   display: flex;
   align-items: center;
-  transition: color 0.3s ease;
+  transition: color 0.5s ease;
 }
 
 .header-search-submit:hover {
-  color: #6d5a43;
+  color: #030213;
 }
 
 /* User Menu */
@@ -157,7 +157,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s ease;
 }
 
 .header-user-btn:hover {
@@ -176,7 +176,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8b7355 0%, #a0826d 100%);
+  background: #030213;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -222,7 +222,7 @@
   color: #2c2c2c;
   text-decoration: none;
   font-size: 0.9rem;
-  transition: background 0.2s ease;
+  transition: background 0.5s ease;
   border: none;
   background: none;
   width: 100%;
@@ -251,14 +251,14 @@
   border: none;
   cursor: pointer;
   padding: 0.5rem;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease;
 }
 
 .header-hamburger span {
   width: 24px;
   height: 2px;
   background: #2c2c2c;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   border-radius: 2px;
 }
 
@@ -291,7 +291,7 @@
   transform: translateY(-100%);
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   max-height: calc(100vh - 80px);
   overflow-y: auto;
   z-index: 999;
@@ -310,7 +310,7 @@
   text-decoration: none;
   padding: 0.75rem 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  transition: color 0.3s ease;
+  transition: color 0.5s ease;
   background: none;
   border-left: none;
   border-right: none;
@@ -321,7 +321,7 @@
 }
 
 .header-mobile-link:hover {
-  color: #8b7355;
+  color: #030213;
 }
 
 .header-mobile-link:last-child {

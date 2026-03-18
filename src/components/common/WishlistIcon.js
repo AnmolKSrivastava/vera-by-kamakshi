@@ -20,7 +20,7 @@ function WishlistIcon() {
           height="22" 
           viewBox="0 0 24 24" 
           fill="none" 
-          stroke="#C48E82" 
+          stroke="#030213" 
           strokeWidth="2" 
           strokeLinecap="round" 
           strokeLinejoin="round"

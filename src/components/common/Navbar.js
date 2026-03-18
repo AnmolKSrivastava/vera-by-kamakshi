@@ -100,7 +100,7 @@ function Navbar({ onLoginClick }) {
                 onClick={() => setSearchOpen(open => !open)}
               >
                 {/* Feather search icon */}
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C48E82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#030213" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-search">
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
@@ -118,8 +118,8 @@ function Navbar({ onLoginClick }) {
                   />
                   <button type="submit" className="navbar-search-btn" aria-label="Search">
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                      <circle cx="8" cy="8" r="7" stroke="#C48E82" strokeWidth="2"/>
-                      <line x1="13" y1="13" x2="17" y2="17" stroke="#C48E82" strokeWidth="2"/>
+                      <circle cx="8" cy="8" r="7" stroke="#030213" strokeWidth="2"/>
+                      <line x1="13" y1="13" x2="17" y2="17" stroke="#030213" strokeWidth="2"/>
                     </svg>
                   </button>
                 </form>
