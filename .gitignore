@@ -32,3 +32,6 @@ ui-debug.log*
 # Service account keys (never commit these!)
 *-firebase-adminsdk-*.json
 service-account*.json
+
+# Figma design files (reference only)
+src/figma design/
