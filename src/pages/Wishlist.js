@@ -41,7 +41,7 @@ function Wishlist() {
             </svg>
             <h2>Your Wishlist is Empty</h2>
             <p>Save items you love for later!</p>
-            <Link to="/shop" className="continue-shopping-btn">
+            <Link to="/collections" className="continue-shopping-btn">
               Browse Products
             </Link>
           </div>

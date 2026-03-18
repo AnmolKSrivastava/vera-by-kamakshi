@@ -85,8 +85,8 @@ function Header({ onLoginClick }) {
                 New Arrivals
               </Link>
               <Link 
-                to="/shop" 
-                className={`header-nav-link${isActive('/shop') ? ' active' : ''}`}
+                to="/collections" 
+                className={`header-nav-link${isActive('/collections') ? ' active' : ''}`}
               >
                 Collections
               </Link>
@@ -229,7 +229,7 @@ function Header({ onLoginClick }) {
           <Link to="/" className="header-mobile-link" onClick={() => setMenuOpen(false)}>
             New Arrivals
           </Link>
-          <Link to="/shop" className="header-mobile-link" onClick={() => setMenuOpen(false)}>
+          <Link to="/collections" className="header-mobile-link" onClick={() => setMenuOpen(false)}>
             Collections
           </Link>
           <Link to="/about" className="header-mobile-link" onClick={() => setMenuOpen(false)}>

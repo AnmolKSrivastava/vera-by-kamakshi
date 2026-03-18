@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from "react";
-import "./Shop.css";
+import "./Collections.css";
 import ProductTile from "../components/product/ProductTile";
 import { useProducts } from "../hooks/useProducts";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorMessage from "../components/common/ErrorMessage";
 
-const Shop = () => {
+const Collections = () => {
   const { products, loading, error, refetch } = useProducts();
   
   // Filter states
@@ -145,11 +145,11 @@ const Shop = () => {
   if (error) return <ErrorMessage error={error} onRetry={refetch} />;
 
   return (
-    <div className="shop-outer-container">
-      <h1 className="shop-title">SHOP</h1>
-      <div className="shop-title-underline"></div>
+    <div className="collections-outer-container">
+      <h1 className="collections-title">COLLECTIONS</h1>
+      <div className="collections-title-underline"></div>
       
-      <div className="shop-layout">
+      <div className="collections-layout">
         {/* Filter Toggle Button (Mobile) */}
         <button 
           className="filter-toggle-btn"
@@ -250,7 +250,7 @@ const Shop = () => {
         {/* Products Section */}
         <div className="products-section">
           {/* Sort and Results Bar */}
-          <div className="shop-controls">
+          <div className="collections-controls">
             <div className="results-count">
               {filteredAndSortedProducts.length} {filteredAndSortedProducts.length === 1 ? 'Product' : 'Products'}
             </div>
@@ -325,4 +325,4 @@ const Shop = () => {
   );
 };
 
-export default Shop;
+export default Collections;

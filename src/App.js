@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 
 // Context Providers
@@ -11,7 +11,7 @@ import { WishlistProvider } from './context/WishlistContext';
 
 // Pages
 import Home from './pages/Home';
-import Shop from './pages/Shop';
+import Collections from './pages/Collections';
 import ProductDescription from './pages/ProductDescription';
 import Cart from './pages/cart/Cart';
 import Wishlist from './pages/Wishlist';
@@ -44,7 +44,8 @@ function AppContent() {
       <div className="app-content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
+          <Route path="/collections" element={<Collections />} />
+          <Route path="/shop" element={<Navigate to="/collections" replace />} />
           <Route path="/product/:id" element={<ProductDescription />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/wishlist" element={<Wishlist />} />

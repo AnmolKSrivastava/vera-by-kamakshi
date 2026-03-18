@@ -26,7 +26,7 @@ const Cart = () => {
           </svg>
           <h2>Your cart is empty</h2>
           <p>Add some products to get started</p>
-          <button className="continue-shopping-btn" onClick={() => navigate('/shop')}>
+          <button className="continue-shopping-btn" onClick={() => navigate('/collections')}>
             Continue Shopping
           </button>
         </div>
@@ -128,7 +128,7 @@ const Cart = () => {
             
             <button 
               className="continue-shopping-link"
-              onClick={() => navigate('/shop')}
+              onClick={() => navigate('/collections')}
             >
               Continue Shopping
             </button>

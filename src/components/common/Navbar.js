@@ -212,7 +212,7 @@ function Navbar({ onLoginClick }) {
         </div>
         <ul className={`navbar-links navbar-links-center${menuOpen ? ' show' : ''}`}>
           <li><Link to="/" onClick={closeMenu} className={isActive('/') ? 'active' : ''}>Home</Link></li>
-          <li><Link to="/shop" onClick={closeMenu} className={isActive('/shop') ? 'active' : ''}>Shop</Link></li>
+          <li><Link to="/collections" onClick={closeMenu} className={isActive('/collections') ? 'active' : ''}>Collections</Link></li>
           <li><Link to="/about" onClick={closeMenu} className={isActive('/about') ? 'active' : ''}>About</Link></li>
           <li><Link to="/contact" onClick={closeMenu} className={isActive('/contact') ? 'active' : ''}>Contact</Link></li>
         </ul>

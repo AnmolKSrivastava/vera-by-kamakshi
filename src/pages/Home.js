@@ -29,7 +29,7 @@ function NewArrivals() {
           ))}
         </div>
       )}
-      <Link to="/shop" className="view-all-btn">View All Products</Link>
+      <Link to="/collections" className="view-all-btn">View All Products</Link>
     </section>
   );
 }

@@ -22,7 +22,7 @@ function Hero() {
         </p>
         <button 
           className="hero-cta"
-          onClick={() => navigate('/shop')}
+          onClick={() => navigate('/collections')}
         >
           EXPLORE COLLECTION
         </button>

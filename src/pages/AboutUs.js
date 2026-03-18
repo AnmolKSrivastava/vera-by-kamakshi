@@ -82,7 +82,7 @@ const AboutUs = () => {
             Discover bags that are more than accessories—they're companions in your journey. 
             Explore our collection and find your perfect match today.
           </p>
-          <a href="/shop" className="cta-button">Explore Our Collection</a>
+          <a href="/collections" className="cta-button">Explore Our Collection</a>
         </section>
       </div>
     </div>

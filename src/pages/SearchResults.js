@@ -94,7 +94,7 @@ function SearchResults() {
             </svg>
             <h2>Enter a search term</h2>
             <p>Try searching for products by name or description</p>
-            <Link to="/shop" className="browse-btn">Browse All Products</Link>
+            <Link to="/collections" className="browse-btn">Browse All Products</Link>
           </div>
         ) : products.length === 0 ? (
           <div className="search-empty">
@@ -105,7 +105,7 @@ function SearchResults() {
             </svg>
             <h2>No products found</h2>
             <p>Try different keywords or browse all products</p>
-            <Link to="/shop" className="browse-btn">Browse All Products</Link>
+            <Link to="/collections" className="browse-btn">Browse All Products</Link>
           </div>
         ) : (
           <div className="search-results-grid">

@@ -1,14 +1,14 @@
-/* Shop Page Styles */
+/* Collections Page Styles */
 
 @media (max-width: 600px) {
-  .shop-outer-container {
+  .collections-outer-container {
     height: auto !important;
     min-height: 0 !important;
   }
 }
 
-/* Small underline below Shop heading */
-.shop-title-underline {
+/* Small underline below Collections heading */
+.collections-title-underline {
   width: 60px;
   height: 3px;
   background: #bfa074;
@@ -16,8 +16,8 @@
   margin: -1.2rem auto 1.5rem auto;
 }
 
-/* Outer container for Shop page */
-.shop-outer-container {
+/* Outer container for Collections page */
+.collections-outer-container {
   width: calc(100vw - 48px);
   min-width: 0;
   min-height: calc(100vh - 180px);
@@ -34,7 +34,7 @@
   box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.07);
 }
 
-.shop-title {
+.collections-title {
   font-size: 2.2rem;
   font-family: 'Playfair Display', serif;
   color: #2E2B28;
@@ -45,8 +45,8 @@
   width: 100%;
 }
 
-/* Shop Layout with Sidebar */
-.shop-layout {
+/* Collections Layout with Sidebar */
+.collections-layout {
   display: flex;
   gap: 2rem;
   width: 100%;
@@ -271,8 +271,8 @@
   min-width: 0;
 }
 
-/* Shop Controls (Sort and Results) */
-.shop-controls {
+/* Collections Controls (Sort and Results) */
+.collections-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -434,7 +434,7 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .shop-layout {
+  .collections-layout {
     gap: 1.5rem;
   }
 
@@ -453,7 +453,7 @@
     display: block;
   }
 
-  .shop-layout {
+  .collections-layout {
     flex-direction: column;
   }
 
@@ -485,7 +485,7 @@
     }
   }
 
-  .shop-controls {
+  .collections-controls {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
@@ -527,11 +527,11 @@
 }
 
 @media (max-width: 600px) {
-  .shop-outer-container {
+  .collections-outer-container {
     padding: 1.5rem 0.75rem 1rem 0.75rem;
   }
 
-  .shop-title {
+  .collections-title {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
   }
@@ -541,7 +541,7 @@
     gap: 1rem 0.5rem;
   }
 
-  .shop-controls {
+  .collections-controls {
     padding: 0.75rem;
   }
 
@@ -554,3 +554,4 @@
     overflow-x: auto;
   }
 }
+

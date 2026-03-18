@@ -34,16 +34,16 @@ function Footer() {
           </div>
         </div>
 
-        {/* Shop Links */}
+        {/* Collections Links */}
         <div className="footer-column">
-          <h4 className="footer-title">Shop</h4>
+          <h4 className="footer-title">Collections</h4>
           <ul className="footer-links">
-            <li><Link to="/shop">All Products</Link></li>
-            <li><Link to="/shop">New Arrivals</Link></li>
-            <li><Link to="/shop">Best Sellers</Link></li>
-            <li><Link to="/shop">Handbags</Link></li>
-            <li><Link to="/shop">Clutches</Link></li>
-            <li><Link to="/shop">Totes</Link></li>
+            <li><Link to="/collections">All Products</Link></li>
+            <li><Link to="/collections">New Arrivals</Link></li>
+            <li><Link to="/collections">Best Sellers</Link></li>
+            <li><Link to="/collections">Handbags</Link></li>
+            <li><Link to="/collections">Clutches</Link></li>
+            <li><Link to="/collections">Totes</Link></li>
           </ul>
         </div>
 
