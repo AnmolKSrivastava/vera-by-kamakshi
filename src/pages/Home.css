@@ -151,18 +151,22 @@
   width: fit-content;
   margin: 2rem auto 0;
   padding: 0.85rem 2.5rem;
-  background: #7a5c4d;
-  color: white;
+  background: transparent;
+  color: #030213;
   text-decoration: none;
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #030213;
+  border-radius: 0;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transition: all 0.5s ease;
+  box-shadow: none;
 }
 
 .view-all-btn:hover {
-  background: #2E2B28;
+  background: #030213;
+  color: white;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -246,7 +250,7 @@
 
 /* Newsletter Section */
 .newsletter-section {
-  background: linear-gradient(135deg, #7a5c4d 0%, #2E2B28 100%);
+  background: #030213;
   padding: 4rem 1.5rem;
   margin: 2rem 0 0 0;
 }
@@ -265,8 +269,9 @@
   font-size: 2rem;
   font-family: 'Playfair Display', serif;
   color: white;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   margin-bottom: 0.75rem;
 }
 
@@ -287,12 +292,12 @@
   flex: 1;
   padding: 1rem 1.5rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 30px;
-  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  background: transparent;
   color: white;
   font-size: 1rem;
   outline: none;
-  transition: all 0.3s;
+  transition: all 0.5s ease;
 }
 
 .newsletter-input::placeholder {
@@ -300,27 +305,29 @@
 }
 
 .newsletter-input:focus {
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.8);
+  background: transparent;
 }
 
 .newsletter-button {
   padding: 1rem 2.5rem;
   background: white;
-  color: #2E2B28;
+  color: #030213;
   border: none;
-  border-radius: 30px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.5s ease;
   white-space: nowrap;
 }
 
 .newsletter-button:hover {
-  background: #FDF5F2;
+  background: #f9f9f9;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
 .newsletter-success {
