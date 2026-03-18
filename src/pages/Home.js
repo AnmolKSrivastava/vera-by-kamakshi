@@ -3,30 +3,11 @@ import React, { useState } from 'react';
 import './Home.css';
 import ProductTile from '../components/product/ProductTile';
 import RecentlyViewed from '../components/product/RecentlyViewed';
+import Hero from '../components/common/Hero';
 import { Link } from 'react-router-dom';
 import { useFeaturedProducts } from '../hooks/useProducts';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
-
-function HeroSection() {
-  return (
-    <section className="hero-section">
-      <div className="hero-content">
-        <h1 className="hero-title">
-          LUXURY<br />
-          BAGS<br />
-          AND<br />
-          PURSES
-        </h1>
-        <p className="hero-subtitle">Elevate your style with handcrafted, elegant bags.<br />Designed for the modern woman. Crafted to last a lifetime.</p>
-  <Link to="/shop" className="hero-cta">Explore Collection</Link>
-      </div>
-      <div className="hero-image-container">
-        <img src="/image_home.png" alt="Luxury bag" className="hero-image" />
-      </div>
-    </section>
-  );
-}
 
 function NewArrivals() {
   const { products: newProducts, loading, error } = useFeaturedProducts(4);
@@ -171,7 +152,7 @@ function Home() {
 
   return (
     <div className="home-container">
-      <HeroSection />
+      <Hero />
       
       <section className="featured-section">
         <header>

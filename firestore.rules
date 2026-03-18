@@ -1,0 +1,61 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // Products - Public read, admin write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Admin users - Admin only
+    match /admins/{userId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // User data - Owner or admin
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+    }
+    
+    // Carts - Owner only
+    match /carts/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Wishlists - Owner only
+    match /wishlists/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Orders - Owner or admin
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    
+    // Reviews - Authenticated users can create, owner can update/delete
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+  }
+}

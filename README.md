@@ -55,6 +55,27 @@ Launches the test runner in interactive watch mode
 ### `npm run build`
 Builds the app for production to the `build` folder
 
+### `firebase deploy`
+Deploys the app to Firebase Hosting (requires Firebase CLI)
+
+## 🚀 Deployment
+
+This project uses automated CI/CD deployment to Firebase Hosting via GitHub Actions.
+
+### Automatic Deployment
+- **Push to `main` branch** → Deploys to production
+- **Create Pull Request** → Creates preview deployment
+
+### Manual Deployment
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+For complete CI/CD setup instructions, see [CICD_SETUP.md](CICD_SETUP.md)
+
+**Live Site:** https://vera-by-kamakshi.web.app
+
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 18, React Router v6

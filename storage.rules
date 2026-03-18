@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && 
+             firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Product images - Admin can write, everyone can read
+    match /products/{productId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // User uploads - Owner can write, everyone can read
+    match /users/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // Temporary uploads - Admin only
+    match /temp/{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

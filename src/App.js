@@ -26,7 +26,7 @@ import TermsConditions from './pages/TermsConditions';
 import FAQ from './pages/FAQ';
 
 // Components
-import Navbar from './components/common/Navbar';
+import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import ScrollToTop from './components/common/ScrollToTop';
 import UserLogin from './components/auth/UserLogin';
@@ -40,7 +40,7 @@ function AppContent() {
   
   return (
     <div className="app-layout">
-      <Navbar onLoginClick={() => setLoginOpen(true)} />
+      <Header onLoginClick={() => setLoginOpen(true)} />
       <div className="app-content">
         <Routes>
           <Route path="/" element={<Home />} />
