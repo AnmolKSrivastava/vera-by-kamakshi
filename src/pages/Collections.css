@@ -26,7 +26,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  background: #FDF5F2;
+  background: #ffffff;
   padding: 5rem 1.5rem 2rem 1.5rem;
   box-sizing: border-box;
   margin: 24px auto 0 auto;
@@ -38,8 +38,8 @@
   font-size: 2.2rem;
   font-family: 'Playfair Display', serif;
   color: #2E2B28;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   margin-bottom: 2rem;
   text-align: center;
   width: 100%;
@@ -62,7 +62,7 @@
   border: 2px solid #e0d5cf;
   border-radius: 8px;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   cursor: pointer;
   margin-bottom: 1rem;
@@ -109,7 +109,7 @@
   border: none;
   color: #7a5c4d;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   text-decoration: underline;
   transition: color 0.2s;
@@ -132,17 +132,17 @@
 
 .filter-section h4 {
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   margin: 0 0 0.75rem 0;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
 }
 
 /* Price Range Filter */
 .price-range-values {
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #7a5c4d;
   margin-bottom: 0.75rem;
 }
@@ -260,7 +260,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 1.1rem;
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
 }
@@ -285,7 +285,7 @@
 
 .results-count {
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
 }
 
@@ -355,7 +355,7 @@
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s;
 }
@@ -363,7 +363,7 @@
 .clear-filters-link:hover {
   background: #2E2B28;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* Pagination */
@@ -382,7 +382,7 @@
   border: 2px solid #e0d5cf;
   border-radius: 6px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   cursor: pointer;
   transition: all 0.3s;
@@ -412,7 +412,7 @@
   border: 2px solid #e0d5cf;
   border-radius: 6px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   cursor: pointer;
   transition: all 0.3s;

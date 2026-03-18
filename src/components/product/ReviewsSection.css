@@ -36,7 +36,7 @@
 
 .rating-number {
   font-size: 3.5rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #2E2B28;
   line-height: 1;
 }
@@ -137,12 +137,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1.1rem;
 }
 
 .author-name {
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   margin-bottom: 0.25rem;
 }
@@ -195,7 +195,7 @@
 .helpful-button:hover {
   border-color: #7a5c4d;
   color: #7a5c4d;
-  background: #FDF5F2;
+  background: #ffffff;
 }
 
 .helpful-button:disabled {
@@ -254,7 +254,7 @@
   border: none;
   padding: 1rem 2rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
@@ -265,7 +265,7 @@
 .write-review-btn:hover {
   background: #000;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* Review Form Container */
@@ -275,12 +275,12 @@
   border-radius: 12px;
   border: 2px solid #e0d5cf;
   margin-top: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .review-form-container h4 {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   margin-bottom: 2rem;
 }
@@ -292,7 +292,7 @@
 .review-form label {
   display: block;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   margin-bottom: 0.75rem;
 }
@@ -329,7 +329,7 @@
   margin-left: 1rem;
   font-size: 1rem;
   color: #7a5c4d;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .review-form textarea {
@@ -368,7 +368,7 @@
 .btn-submit {
   padding: 0.75rem 2rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
@@ -393,7 +393,7 @@
 .btn-submit:hover:not(:disabled) {
   background: #000;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .btn-submit:disabled,

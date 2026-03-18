@@ -33,7 +33,7 @@
 .tab-button.active {
   color: #2E2B28;
   border-bottom-color: #7a5c4d;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .tabs-content {
@@ -90,7 +90,7 @@
 .tab-panel ul li:before {
   content: "•";
   color: #7a5c4d;
-  font-weight: bold;
+  font-weight: 500;
   position: absolute;
   left: 0;
 }
@@ -164,7 +164,7 @@
 
 .craftsmanship-note,
 .policy-note {
-  background: #FDF5F2;
+  background: #ffffff;
   border-left: 4px solid #7a5c4d;
   padding: 1rem 1.5rem;
   margin-top: 1rem;

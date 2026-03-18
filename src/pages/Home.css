@@ -168,7 +168,7 @@
   background: #030213;
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* Testimonials Section */
@@ -187,7 +187,7 @@
 }
 
 .testimonial-card {
-  background: #FDF5F2;
+  background: #ffffff;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -196,7 +196,7 @@
 
 .testimonial-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .testimonial-rating {
@@ -237,7 +237,7 @@
 
 .testimonial-name {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   margin: 0 0 0.25rem 0;
 }
@@ -327,7 +327,7 @@
 .newsletter-button:hover {
   background: #f9f9f9;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .newsletter-success {
@@ -341,7 +341,7 @@
   border-radius: 12px;
   color: white;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 500;
   animation: fadeIn 0.3s;
 }
 

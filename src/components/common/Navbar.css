@@ -11,8 +11,8 @@
   border-radius: 30px;
   font-size: 1rem;
   font-family: 'Playfair Display', serif;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   cursor: pointer;
   text-decoration: none;
   box-shadow: 0 2px 12px rgba(44, 43, 40, 0.07);
@@ -75,10 +75,10 @@
 .navbar-logo {
   position: static;
   font-size: 2rem;
-  font-weight: bold;
+  font-weight: 500;
   color: #2E2B28;
   text-align: center;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   margin-bottom: 0.5rem;
   z-index: 1;
   text-decoration: none;
@@ -163,7 +163,7 @@
 
 .navbar-links li a.active {
   color: #C48E82;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .navbar-links li a.active::after {
@@ -175,7 +175,7 @@
   font-size: 1.1rem;
   font-weight: 400;
   font-family: 'Playfair Display', serif;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.02em;
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -204,7 +204,7 @@
 
 .user-profile-btn:hover {
   background: rgba(217, 167, 156, 0.2);
-  box-shadow: 0 4px 12px rgba(44, 43, 40, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .user-avatar,
@@ -221,7 +221,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.9rem;
 }
 
@@ -260,7 +260,7 @@
   right: 0;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(44, 43, 40, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   min-width: 240px;
   z-index: 999;
   animation: dropdownSlideIn 0.3s ease-out;
@@ -290,7 +290,7 @@
 }
 
 .dropdown-user-name {
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   font-size: 1rem;
 }
@@ -393,7 +393,7 @@
   border: 2px solid #C48E82;
   border-radius: 30px;
   padding: 0.4rem 0.6rem 0.4rem 1rem;
-  box-shadow: 0 4px 16px rgba(196, 142, 130, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   animation: searchSlideIn 0.3s ease-out;
   z-index: 1002;
   min-width: 280px;
@@ -443,7 +443,7 @@
 
 .navbar-search-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(196, 142, 130, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .navbar-search-btn svg {
@@ -557,7 +557,7 @@
     max-width: 320px;
     align-items: stretch;
     background: #fff;
-    box-shadow: 0 4px 16px rgba(44, 43, 40, 0.15);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     border-radius: 8px;
     margin: 0.8rem auto 0 auto;
     padding: 0.5rem 0;
@@ -604,7 +604,7 @@
   .navbar-links li a.active {
     background: rgba(196, 142, 130, 0.15);
     color: #C48E82;
-    font-weight: 600;
+    font-weight: 500;
   }
   
   .navbar-links li a:hover,

@@ -13,7 +13,7 @@
 
 .cart-title {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 2rem;
   color: #222;
 }
@@ -183,7 +183,7 @@
 
 .cart-item-total {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #222;
   text-align: right;
 }
@@ -245,7 +245,7 @@
 
 .summary-total {
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #222;
   margin-bottom: 2rem;
 }

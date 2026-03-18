@@ -15,11 +15,11 @@
 /* Page Title */
 .page-title {
   font-size: 3rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #2c3e50;
   text-align: center;
   margin-bottom: 20px;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.02em;
 }
 
 .page-intro {
@@ -42,12 +42,12 @@
 }
 
 .content-section:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .content-section h2 {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2c3e50;
   margin-bottom: 20px;
   border-bottom: 3px solid #d4a574;
@@ -56,7 +56,7 @@
 
 .content-section h3 {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #34495e;
   margin: 25px 0 15px;
 }
@@ -85,13 +85,13 @@
 .content-section ul li strong,
 .content-section ol li strong {
   color: #2c3e50;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .content-section a {
   color: #d4a574;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   transition: color 0.3s ease;
 }
 
@@ -127,7 +127,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.95rem;
 }
 
@@ -158,13 +158,13 @@
   padding: 40px 30px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .value-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .value-icon {
@@ -174,7 +174,7 @@
 
 .value-card h3 {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2c3e50;
   margin-bottom: 12px;
 }
@@ -213,7 +213,7 @@
 
 .cta-section h3 {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 15px;
   color: white;
 }
@@ -227,7 +227,7 @@
 .cta-section .btn {
   padding: 15px 40px;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.3s ease;
@@ -244,7 +244,7 @@
   background: #b8935f;
   border-color: #b8935f;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 165, 116, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .btn-secondary {
@@ -271,12 +271,12 @@
   background: white;
   padding: 40px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .contact-form-section h2 {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2c3e50;
   margin-bottom: 10px;
 }
@@ -295,7 +295,7 @@
 .contact-form label {
   display: block;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2c3e50;
   margin-bottom: 8px;
 }
@@ -331,7 +331,7 @@
   background: #d4a574;
   color: white;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -341,7 +341,7 @@
 .contact-form button[type="submit"]:hover {
   background: #b8935f;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 165, 116, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .success-message {
@@ -366,13 +366,13 @@
   background: white;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .contact-info-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .contact-info-card .icon {
@@ -383,7 +383,7 @@
 
 .contact-info-card h3 {
   font-size: 1.3rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2c3e50;
   margin-bottom: 10px;
 }
@@ -398,7 +398,7 @@
 .contact-info-card a {
   color: #d4a574;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   transition: color 0.3s ease;
 }
 
@@ -412,13 +412,13 @@
   background: white;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   text-align: center;
 }
 
 .social-links h3 {
   font-size: 1.3rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2c3e50;
   margin-bottom: 20px;
 }
@@ -447,7 +447,7 @@
   background: #d4a574;
   color: white;
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* Policy Table */
@@ -469,7 +469,7 @@
 .policy-table thead th {
   padding: 18px 20px;
   text-align: left;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1.1rem;
 }
 
@@ -492,7 +492,7 @@
 }
 
 .policy-table td:first-child {
-  font-weight: 600;
+  font-weight: 500;
   color: #2c3e50;
 }
 
@@ -530,7 +530,7 @@
 
 .faq-category-title {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2c3e50;
   margin-bottom: 25px;
   padding-bottom: 12px;
@@ -552,11 +552,11 @@
 }
 
 .faq-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .faq-item.active {
-  box-shadow: 0 4px 16px rgba(212, 165, 116, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .faq-question {
@@ -566,7 +566,7 @@
   border: none;
   text-align: left;
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2c3e50;
   cursor: pointer;
   display: flex;
@@ -631,7 +631,7 @@
 
 .faq-cta h3 {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 15px;
   color: white;
 }
@@ -652,7 +652,7 @@
 .faq-cta-buttons .btn {
   padding: 14px 32px;
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.3s ease;

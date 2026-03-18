@@ -15,7 +15,7 @@
   align-items: flex-start;
   justify-content: flex-start;
   gap: 3.5rem;
-  background: #FDF5F2;
+  background: #ffffff;
   padding: 2rem;
   box-sizing: border-box;
   border-radius: 18px;
@@ -61,7 +61,7 @@
 
 .wishlist-button:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .wishlist-button.active {
@@ -73,7 +73,7 @@
   font-size: 1.65rem;
   font-family: 'Playfair Display', serif;
   color: #2E2B28;
-  font-weight: 700;
+  font-weight: 500;
   margin: 0;
   padding-right: 60px;
   line-height: 1.3;
@@ -82,7 +82,7 @@
 .product-desc-price {
   font-size: 1.35rem;
   color: #7a5c4d;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* Stock & Urgency Indicators */
@@ -99,7 +99,7 @@
   padding: 0.4rem 0.85rem;
   border-radius: 20px;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .stock-indicator.available {
@@ -125,7 +125,7 @@
   color: #1565c0;
   border-radius: 20px;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* Product Highlights */
@@ -154,10 +154,10 @@
 
 .product-option-label {
   font-size: 0.88rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -168,7 +168,7 @@
   color: #7a5c4d;
   font-weight: 500;
   text-transform: none;
-  background: #FDF5F2;
+  background: #ffffff;
   padding: 0.2rem 0.65rem;
   border-radius: 12px;
 }
@@ -195,7 +195,7 @@
 
 .color-dot:hover {
   transform: scale(1.15);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .color-dot.selected {
@@ -224,7 +224,7 @@
   background: white;
   border-radius: 8px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #666;
   cursor: pointer;
   transition: all 0.2s;
@@ -274,7 +274,7 @@
   cursor: pointer;
   transition: background-color 0.2s;
   color: #2E2B28;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .quantity-selector button:hover:not(:disabled) {
@@ -288,7 +288,7 @@
 
 .quantity-selector span {
   padding: 0 1.25rem;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1rem;
   min-width: 45px;
   text-align: center;
@@ -306,13 +306,13 @@
   flex: 1;
   padding: 0.95rem 1.75rem;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
 }
 
 .add-to-cart-btn {
@@ -323,7 +323,7 @@
 .add-to-cart-btn:hover:not(:disabled) {
   background-color: #000;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .add-to-cart-btn.added {
@@ -344,7 +344,7 @@
 .buy-now-btn:hover:not(:disabled) {
   background-color: #5a3c2d;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(122, 92, 77, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .buy-now-btn:disabled {
@@ -385,7 +385,7 @@
 
 .delivery-details strong {
   color: #2E2B28;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.9rem;
 }
 
@@ -441,14 +441,14 @@
 }
 
 .sticky-product-name {
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   font-size: 0.95rem;
 }
 
 .sticky-product-price {
   color: #7a5c4d;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1.1rem;
 }
 
@@ -458,12 +458,12 @@
   border: none;
   padding: 0.9rem 2rem;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
   white-space: nowrap;
 }
 

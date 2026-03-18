@@ -4,7 +4,7 @@
   right: 0;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(44, 43, 40, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   min-width: 320px;
   max-width: 400px;
   z-index: 1003;
@@ -114,7 +114,7 @@
 
 .suggestion-name {
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #2E2B28;
   margin: 0 0 0.25rem 0;
   white-space: nowrap;
@@ -150,7 +150,7 @@
   display: block;
   text-align: center;
   color: #C48E82;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.95rem;
   text-decoration: none;
   transition: color 0.2s ease;
