@@ -67,13 +67,24 @@
 
 /* Mobile Responsive */
 @media (max-width: 600px) {
+  .wishlist-icon-container {
+    display: none !important;
+  }
+  
   .wishlist-icon-btn {
-    padding: 0.4rem;
+    padding: 0.3rem;
+  }
+  
+  .wishlist-icon-btn svg {
+    width: 22px;
+    height: 22px;
   }
 
   .wishlist-badge {
     font-size: 0.6rem;
     min-width: 16px;
     height: 16px;
+    top: 0;
+    right: 0;
   }
 }

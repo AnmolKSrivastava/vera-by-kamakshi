@@ -331,6 +331,8 @@
   gap: 2rem 1.2rem;
   justify-items: center;
   margin-bottom: 2rem;
+  padding: 0 0.5rem;
+  box-sizing: border-box;
 }
 
 /* No Products Message */
@@ -531,7 +533,7 @@
   .collections-outer-container {
     width: 100%;
     max-width: 100%;
-    padding: 2rem 1rem 1.5rem;
+    padding: 2rem 0.75rem 1.5rem;
     margin: 12px auto 0;
   }
 
@@ -542,7 +544,7 @@
 
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem 0.5rem;
+    gap: 1.2rem 0.5rem;
   }
 
   .collections-controls {

@@ -19,6 +19,13 @@
   backdrop-filter: blur(8px) saturate(120%);
   transition: background 0.5s, color 0.2s, box-shadow 0.2s, transform 0.22s cubic-bezier(.4,2,.6,1);
 }
+
+@media (max-width: 600px) {
+  .login-btn {
+    display: none !important;
+  }
+}
+
 .login-btn:hover, .login-btn:focus {
   background: rgba(196, 142, 130, 0.8);
   color: #fff;
@@ -189,6 +196,12 @@
   position: relative;
 }
 
+@media (max-width: 600px) {
+  .user-profile-container {
+    display: none !important;
+  }
+}
+
 .user-profile-btn {
   display: flex;
   align-items: center;
@@ -354,6 +367,12 @@
   align-items: center;
 }
 
+@media (max-width: 600px) {
+  .navbar-search-container {
+    display: none !important;
+  }
+}
+
 .navbar-search-icon {
   background: none;
   border: none;
@@ -461,29 +480,31 @@
 
 @media (max-width: 600px) {
   .navbar {
-    padding: 1.2rem 1rem 0.7rem 1rem;
+    padding: 1.2rem 0.5rem 0.7rem 0.5rem;
     min-height: 70px;
     position: sticky;
   }
   
   .navbar.scrolled {
-    padding: 1rem 1rem 0.6rem 1rem;
+    padding: 1rem 0.5rem 0.6rem 0.5rem;
   }
   
   .navbar-row {
     justify-content: flex-start;
   }
   .navbar-col-left {
-    flex: 1 1 0;
+    flex: 0 0 auto;
     justify-content: flex-start;
   }
   .navbar-col-center {
-    flex: 2 1 0;
+    flex: 1 1 auto;
     justify-content: center;
   }
   .navbar-col-right {
-    flex: 1 1 0;
+    flex: 0 0 auto;
     justify-content: flex-end;
+    gap: 0.3rem;
+    overflow: visible;
   }
   
   .navbar-logo {
@@ -495,31 +516,22 @@
   .hamburger {
     display: flex;
     padding: 0.5rem;
-    margin-left: -0.5rem;
+    margin-left: 0;
   }
   
-  /* User Profile Mobile */
-  .user-profile-btn {
-    padding: 0.3rem 0.6rem 0.3rem 0.3rem;
-    gap: 0.3rem;
+  /* Hide search, wishlist, login/profile on mobile - moved to hamburger menu */
+  .navbar .navbar-col-right .navbar-search-container,
+  .navbar .navbar-col-right .wishlist-icon-container,
+  .navbar .navbar-col-right .login-btn,
+  .navbar .navbar-col-right .user-profile-container {
+    display: none !important;
+    visibility: hidden !important;
   }
   
-  .user-name {
-    display: none;
-  }
-  
-  .dropdown-arrow {
-    display: none;
-  }
-  
-  .user-avatar,
-  .user-avatar-placeholder {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .user-dropdown {
-    right: -1rem;
+  /* Keep cart visible */
+  .navbar .navbar-col-right .cart-icon-button {
+    display: flex !important;
+    visibility: visible !important;
   }
   
   .menu-backdrop {
@@ -613,13 +625,89 @@
     color: #030213;
   }
   
-  /* Search on Mobile */
-  .navbar-search-icon {
-    padding: 0.4rem;
+  /* Mobile menu items */
+  .mobile-menu-item {
+    display: none;
   }
   
-  .navbar-search-form {
-    min-width: 240px;
-    right: -0.5rem;
+  @media (max-width: 600px) {
+    .mobile-menu-item {
+      display: block;
+      border-top: 1px solid #e5e5e5;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+    }
+    
+    .mobile-login-btn,
+    .mobile-menu-link {
+      width: 100%;
+      padding: 0.85rem 1.25rem;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      font-family: 'Playfair Display', serif;
+      color: #2E2B28;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      transition: background 0.5s, color 0.2s;
+      text-decoration: none;
+    }
+    
+    .mobile-login-btn:hover,
+    .mobile-menu-link:hover {
+      background: #f5f5f5;
+      color: #030213;
+    }
+    
+    .mobile-logout {
+      color: #dc3545;
+    }
+    
+    .mobile-user-info {
+      padding: 1rem;
+      background: #f8f9fa;
+    }
+    
+    .mobile-user-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    
+    .mobile-user-avatar,
+    .mobile-user-avatar-placeholder {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    
+    .mobile-user-avatar-placeholder {
+      background: #030213;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+    
+    .mobile-user-name {
+      font-weight: 500;
+      font-size: 1rem;
+      color: #030213;
+      margin-bottom: 0.25rem;
+    }
+    
+    .mobile-user-email {
+      font-size: 0.85rem;
+      color: #666;
+    }
   }
 }

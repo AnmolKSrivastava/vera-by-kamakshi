@@ -49,3 +49,23 @@
 .cart-icon-button.pulse {
   animation: cartPulse 0.3s ease;
 }
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .cart-icon-button {
+    padding: 0.3rem;
+  }
+  
+  .cart-icon-button svg {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .cart-badge {
+    font-size: 0.65rem;
+    min-width: 16px;
+    height: 16px;
+    top: -2px;
+    right: -2px;
+  }
+}

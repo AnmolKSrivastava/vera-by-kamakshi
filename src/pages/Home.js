@@ -8,12 +8,17 @@ import { Link } from 'react-router-dom';
 import { useFeaturedProducts } from '../hooks/useProducts';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
+import useScrollReveal from '../hooks/useScrollReveal';
 
 function NewArrivals() {
   const { products: newProducts, loading, error } = useFeaturedProducts(4);
+  const [sectionRef, isVisible] = useScrollReveal();
 
   return (
-    <section className="new-arrivals-section">
+    <section 
+      ref={sectionRef}
+      className={`new-arrivals-section scroll-reveal ${isVisible ? 'is-visible' : ''}`}
+    >
       <div className="section-header">
         <h2 className="section-title">NEW ARRIVALS</h2>
         <p className="section-subtitle">Discover our latest collection of handcrafted bags</p>
@@ -23,7 +28,7 @@ function NewArrivals() {
       ) : error ? (
         <div className="error-state">Unable to load products</div>
       ) : (
-        <div className="new-arrivals-grid">
+        <div className={`new-arrivals-grid scroll-reveal-stagger ${isVisible ? 'is-visible' : ''}`}>
           {newProducts.slice(0, 4).map((product, idx) => (
             <ProductTile key={product.id || idx} {...product} product={product} />
           ))}
@@ -35,6 +40,8 @@ function NewArrivals() {
 }
 
 function Testimonials() {
+  const [sectionRef, isVisible] = useScrollReveal();
+  
   const testimonials = [
     {
       name: 'Priya Sharma',
@@ -60,12 +67,15 @@ function Testimonials() {
   ];
 
   return (
-    <section className="testimonials-section">
+    <section 
+      ref={sectionRef}
+      className={`testimonials-section scroll-reveal ${isVisible ? 'is-visible' : ''}`}
+    >
       <div className="section-header">
         <h2 className="section-title">WHAT OUR CUSTOMERS SAY</h2>
         <p className="section-subtitle">Real reviews from real customers</p>
       </div>
-      <div className="testimonials-grid">
+      <div className={`testimonials-grid scroll-reveal-stagger ${isVisible ? 'is-visible' : ''}`}>
         {testimonials.map((testimonial, index) => (
           <div key={index} className="testimonial-card">
             <div className="testimonial-rating">
@@ -90,6 +100,7 @@ function Newsletter() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [error, setError] = useState('');
+  const [sectionRef, isVisible] = useScrollReveal();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -113,7 +124,10 @@ function Newsletter() {
   };
 
   return (
-    <section className="newsletter-section">
+    <section 
+      ref={sectionRef}
+      className={`newsletter-section scroll-reveal ${isVisible ? 'is-visible' : ''}`}
+    >
       <div className="newsletter-container">
         <div className="newsletter-content">
           <h2 className="newsletter-title">JOIN OUR NEWSLETTER</h2>
@@ -149,12 +163,17 @@ function Newsletter() {
 
 function Home() {
   const { products: featured, loading, error, refetch } = useFeaturedProducts(4);
+  const [featuredRef, featuredVisible] = useScrollReveal();
+  const [recentlyViewedRef, recentlyViewedVisible] = useScrollReveal();
 
   return (
     <div className="home-container">
       <Hero />
       
-      <section className="featured-section">
+      <section 
+        ref={featuredRef}
+        className={`featured-section scroll-reveal ${featuredVisible ? 'is-visible' : ''}`}
+      >
         <header>
           <h1 className="featured-title">OUR FEATURED COLLECTION</h1>
         </header>
@@ -163,7 +182,7 @@ function Home() {
         ) : error ? (
           <ErrorMessage error={error} onRetry={refetch} />
         ) : (
-          <div className="featured-product-grid">
+          <div className={`featured-product-grid scroll-reveal-stagger ${featuredVisible ? 'is-visible' : ''}`}>
             {featured.length === 0 ? (
               <div style={{gridColumn: '1 / -1', textAlign: 'center'}}>No featured products found.</div>
             ) : (
@@ -179,7 +198,12 @@ function Home() {
       
       <Testimonials />
       
-      <RecentlyViewed limit={4} />
+      <div 
+        ref={recentlyViewedRef}
+        className={`scroll-reveal ${recentlyViewedVisible ? 'is-visible' : ''}`}
+      >
+        <RecentlyViewed limit={4} />
+      </div>
       
       <Newsletter />
     </div>

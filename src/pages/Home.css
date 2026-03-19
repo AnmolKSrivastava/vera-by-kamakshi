@@ -31,6 +31,7 @@
   gap: 2rem 1.2rem;
   justify-items: center;
   margin: 2.5rem auto 0 auto;
+  padding: 0 0.5rem;
   box-sizing: border-box;
   overflow: visible;
 }
@@ -42,12 +43,14 @@
 @media (max-width: 800px) {
   .featured-product-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem 0.75rem;
   }
 }
 @media (max-width: 600px) {
   .featured-product-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.2rem 0.5rem;
+    padding: 0;
   }
 }
 .featured-section {
@@ -79,7 +82,7 @@
   .featured-section {
     min-height: 0;
     height: auto;
-    padding: 1.2rem 0.2rem 1.2rem 0.2rem;
+    padding: 1.5rem 0 1.5rem 0;
     align-items: center;
     justify-content: center;
     margin-top: 1.2rem;
@@ -89,13 +92,24 @@
   .featured-title {
     font-size: 1.3rem;
     text-align: center;
+    padding: 0 0.75rem;
   }
   .featured-product-grid {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding: 0 0.75rem 0.5rem 0.75rem;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Remove side margins on mobile to prevent overflow */
+  .featured-product-grid > .product-tile:first-child {
+    margin-left: 0;
+  }
+  .featured-product-grid > .product-tile:nth-child(2n) {
+    margin-right: 0;
   }
 }
 /* Old hero section styles removed - now using Hero component */
@@ -104,6 +118,65 @@
   display: block;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Scroll Reveal Animation */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger animation for child elements */
+.scroll-reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.scroll-reveal-stagger.is-visible > *:nth-child(1) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.1s;
+}
+
+.scroll-reveal-stagger.is-visible > *:nth-child(2) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.2s;
+}
+
+.scroll-reveal-stagger.is-visible > *:nth-child(3) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.3s;
+}
+
+.scroll-reveal-stagger.is-visible > *:nth-child(4) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.4s;
+}
+
+.scroll-reveal-stagger.is-visible > *:nth-child(n+5) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.5s;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal,
+  .scroll-reveal-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 /* Removed generic h1 and p styles - using specific component classes instead */

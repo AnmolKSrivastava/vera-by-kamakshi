@@ -446,14 +446,20 @@
 @media (max-width: 480px) {
   .product-tile {
     border-radius: 0.6rem;
+    max-width: 100%;
+    width: 100%;
   }
   
   .product-image-container {
-    height: 240px;
+    height: 220px;
   }
   
   .product-info {
-    padding: 1rem;
+    padding: 0.85rem 0.75rem;
+  }
+  
+  .product-name {
+    font-size: 0.95rem;
   }
   
   .product-badges {
@@ -462,19 +468,19 @@
   }
   
   .badge {
-    font-size: 0.65rem;
-    padding: 0.3rem 0.6rem;
+    font-size: 0.6rem;
+    padding: 0.25rem 0.5rem;
   }
   
   .product-tile-wishlist-btn {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     top: 0.5rem;
     right: 0.5rem;
   }
   
   .product-tile-wishlist-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
 }
