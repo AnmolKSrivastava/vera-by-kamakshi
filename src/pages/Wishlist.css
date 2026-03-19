@@ -268,11 +268,18 @@
   }
   
   .wishlist-container {
-    padding: 1.5rem;
+    padding: 1.5rem 1rem;
+    margin: 12px auto;
   }
 
   .wishlist-header h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    letter-spacing: 0.05em;
+  }
+  
+  .wishlist-header {
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
   }
 
   .wishlist-grid {
@@ -303,12 +310,23 @@
 }
 
 @media (max-width: 480px) {
+  .wishlist-page {
+    padding: 2.5rem 0.75rem 1.5rem;
+  }
+  
   .wishlist-container {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
+    margin: 8px auto;
   }
   
   .wishlist-header h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    letter-spacing: 0.04em;
+  }
+  
+  .wishlist-header {
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
   }
 
   .wishlist-grid {
@@ -330,5 +348,15 @@
   .remove-from-wishlist-btn svg {
     width: 16px;
     height: 16px;
+  }
+  
+  .wishlist-item-details {
+    padding: 0.75rem;
+  }
+  
+  .move-to-cart-btn {
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    letter-spacing: 0.1em;
   }
 }
