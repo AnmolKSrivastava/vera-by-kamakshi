@@ -47,7 +47,7 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       // Future: Load user's cart from Firestore and merge with local cart
-      console.log('User logged in, cart sync not yet implemented');
+      // console.log('User logged in, cart sync not yet implemented');
     }
   }, [user]);
 

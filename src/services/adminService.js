@@ -23,7 +23,10 @@ export async function fetchAdminEmails() {
     
     return adminEmails;
   } catch (error) {
-    console.error('[AdminService] Error fetching admin emails:', error);
+    // Suppress permission errors (expected for non-admin users)
+    if (!error.code?.includes('permission')) {
+      console.error('[AdminService] Error fetching admin emails:', error);
+    }
     return [];
   }
 }

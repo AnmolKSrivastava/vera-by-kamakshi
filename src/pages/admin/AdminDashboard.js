@@ -3,10 +3,11 @@ import "./AdminDashboard.css";
 import { useState, useEffect, useCallback } from "react";
 import { productService } from "../../services/productService";
 import { storageService } from "../../services/storageService";
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 import { db } from "../../config/firebase";
 import { useAuth } from "../../context/AuthContext";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import AdminOrdersManagement from './orders/AdminOrdersManagement';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -93,65 +94,105 @@ const AdminDashboard = () => {
     }
   };
 
-  // Fetch Activity Logs
-  const fetchActivityLogs = useCallback(async () => {
+  // Real-time Activity Logs Listener
+  const fetchActivityLogs = useCallback(() => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'activityLogs'));
-      const logs = querySnapshot.docs
-        .map(doc => ({ id: doc.id, ...doc.data() }))
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .slice(0, 50); // Latest 50 logs
-      setActivityLogs(logs);
+      const q = query(
+        collection(db, 'activityLogs'),
+        orderBy('timestamp', 'desc'),
+        limit(50)
+      );
+      
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const logs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setActivityLogs(logs);
+      }, (err) => {
+        console.error('Error fetching activity logs:', err);
+      });
+      
+      return unsubscribe;
     } catch (err) {
-      console.error('Error fetching activity logs:', err);
+      console.error('Error setting up activity logs listener:', err);
+      return () => {};
     }
   }, []);
 
-  // Fetch Users
-  const fetchUsers = useCallback(async () => {
+  // Real-time Users Listener
+  const fetchUsers = useCallback(() => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'users'));
-      const usersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setUsers(usersList);
+      const unsubscribe = onSnapshot(collection(db, 'users'), (querySnapshot) => {
+        const usersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setUsers(usersList);
+      }, (err) => {
+        console.error('Error fetching users:', err);
+      });
+      
+      return unsubscribe;
     } catch (err) {
-      console.error('Error fetching users:', err);
+      console.error('Error setting up users listener:', err);
+      return () => {};
     }
   }, []);
 
-  // Fetch Coupons
-  const fetchCoupons = useCallback(async () => {
+  // Real-time Coupons Listener
+  const fetchCoupons = useCallback(() => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'coupons'));
-      const couponsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setCoupons(couponsList);
+      const unsubscribe = onSnapshot(collection(db, 'coupons'), (querySnapshot) => {
+        const couponsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setCoupons(couponsList);
+      }, (err) => {
+        console.error('Error fetching coupons:', err);
+      });
+      
+      return unsubscribe;
     } catch (err) {
-      console.error('Error fetching coupons:', err);
+      console.error('Error setting up coupons listener:', err);
+      return () => {};
     }
   }, []);
 
-  // Fetch all products
-  const fetchProducts = useCallback(async () => {
+  // Real-time Products Listener
+  const fetchProducts = useCallback(() => {
     setLoadingProducts(true);
     try {
-      const productList = await productService.getAll();
-      setProducts(productList);
+      const unsubscribe = productService.subscribeToAll(
+        (productList) => {
+          setProducts(productList);
+          setLoadingProducts(false);
+        },
+        (err) => {
+          console.error("Error fetching products:", err);
+          setLoadingProducts(false);
+        }
+      );
+      return unsubscribe;
     } catch (err) {
-      console.error("Error fetching products:", err);
+      console.error("Error setting up products listener:", err);
+      setLoadingProducts(false);
+      return () => {};
     }
-    setLoadingProducts(false);
   }, []);
   
-  // Fetch Stock History
-  const fetchStockHistory = useCallback(async () => {
+  // Real-time Stock History Listener
+  const fetchStockHistory = useCallback(() => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'stockHistory'));
-      const history = querySnapshot.docs
-        .map(doc => ({ id: doc.id, ...doc.data() }))
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .slice(0, 100); // Latest 100 entries
-      setStockHistory(history);
+      const q = query(
+        collection(db, 'stockHistory'),
+        orderBy('timestamp', 'desc'),
+        limit(100)
+      );
+      
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const history = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setStockHistory(history);
+      }, (err) => {
+        console.error('Error fetching stock history:', err);
+      });
+      
+      return unsubscribe;
     } catch (err) {
-      console.error('Error fetching stock history:', err);
+      console.error('Error setting up stock history listener:', err);
+      return () => {};
     }
   }, []);
   
@@ -207,25 +248,36 @@ const AdminDashboard = () => {
     }
   }, [products]);
 
-  // Fetch products when Products section is opened
+  // Setup real-time listeners based on active section
   useEffect(() => {
+    const unsubscribers = [];
+    
     if (activeSection === "products") {
-      fetchProducts();
+      unsubscribers.push(fetchProducts());
     } else if (activeSection === "coupons") {
-      fetchCoupons();
+      unsubscribers.push(fetchCoupons());
     } else if (activeSection === "users") {
-      fetchUsers();
+      unsubscribers.push(fetchUsers());
     } else if (activeSection === "logs") {
-      fetchActivityLogs();
+      unsubscribers.push(fetchActivityLogs());
     } else if (activeSection === "inventory") {
-      fetchProducts();
-      fetchStockHistory();
+      unsubscribers.push(fetchProducts());
+      unsubscribers.push(fetchStockHistory());
     } else if (activeSection === "dashboard") {
-      fetchProducts();
-      fetchUsers();
-      fetchCoupons();
+      unsubscribers.push(fetchProducts());
+      unsubscribers.push(fetchUsers());
+      unsubscribers.push(fetchCoupons());
       fetchAnalytics();
     }
+    
+    // Cleanup: unsubscribe from all listeners when section changes or component unmounts
+    return () => {
+      unsubscribers.forEach(unsubscribe => {
+        if (typeof unsubscribe === 'function') {
+          unsubscribe();
+        }
+      });
+    };
   }, [activeSection, fetchProducts, fetchCoupons, fetchUsers, fetchActivityLogs, fetchStockHistory, fetchAnalytics]);
 
   const handleChange = (e) => {
@@ -1520,10 +1572,7 @@ const AdminDashboard = () => {
         )}
 
         {activeSection === "orders" && (
-          <div className="orders-section">
-            <h1 className="admin-title">Orders Management</h1>
-            <div className="placeholder-section">Orders section coming soon...</div>
-          </div>
+          <AdminOrdersManagement onLog={logActivity} />
         )}
 
         {activeSection === "users" && (

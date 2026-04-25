@@ -36,7 +36,7 @@ export const WishlistProvider = ({ children }) => {
   // TODO: Sync wishlist with Firestore when user logs in
   useEffect(() => {
     if (user) {
-      console.log('User logged in, wishlist sync not yet implemented');
+      // console.log('User logged in, wishlist sync not yet implemented');
     }
   }, [user]);
 
