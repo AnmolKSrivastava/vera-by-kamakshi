@@ -58,5 +58,20 @@ service cloud.firestore {
       allow create: if isSignedIn();
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
+    
+    // Coupons - Admin only
+    match /coupons/{couponId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Activity Logs - Admin only
+    match /activityLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Stock History - Admin only
+    match /stockHistory/{historyId} {
+      allow read, write: if isAdmin();
+    }
   }
 }

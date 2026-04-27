@@ -50,6 +50,10 @@ const AdminDashboard = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   
+  // Delete User Confirmation State
+  const [deleteUserModalOpen, setDeleteUserModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  
   // Coupons State
   const [coupons, setCoupons] = useState([]);
   const [couponForm, setCouponForm] = useState({
@@ -108,12 +112,12 @@ const AdminDashboard = () => {
   };
 
   // Fetch Analytics Data
-  const fetchAnalytics = useCallback(async () => {
+  const fetchAnalytics = useCallback(async (productList) => {
     try {
       // For now, generate mock analytics data from products
       // In production, this would query orders collection
       const categoryBreakdown = {};
-      products.forEach(p => {
+      productList.forEach(p => {
         const cat = p.category || 'Uncategorized';
         if (!categoryBreakdown[cat]) {
           categoryBreakdown[cat] = { name: cat, value: 0, count: 0 };
@@ -137,7 +141,7 @@ const AdminDashboard = () => {
       }
       
       // Top products by stock value
-      const topProducts = [...products]
+      const topProducts = [...productList]
         .filter(p => p.stock > 0)
         .sort((a, b) => (b.price * b.stock) - (a.price * a.stock))
         .slice(0, 5)
@@ -157,7 +161,7 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error('Error fetching analytics:', err);
     }
-  }, [products]);
+  }, []);
 
   // Fetch data when section changes (no real-time listeners to avoid Firestore bugs)
   useEffect(() => {
@@ -228,7 +232,7 @@ const AdminDashboard = () => {
           const couponsList = couponsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setCoupons(couponsList);
           
-          fetchAnalytics();
+          fetchAnalytics(productList);
         } catch (err) {
           console.error("Error fetching dashboard data:", err);
         }
@@ -248,8 +252,8 @@ const AdminDashboard = () => {
     try {
       for (const product of bulkUpdateProducts) {
         if (product.newStock !== undefined && product.newStock !== product.stock) {
-          const oldStock = product.stock;
-          const newStock = Number(product.newStock);
+          const oldStock = Number(product.stock) || 0;
+          const newStock = Number(product.newStock) || 0;
           
           // Update product stock
           await updateDoc(doc(db, 'products', product.id), {
@@ -259,8 +263,8 @@ const AdminDashboard = () => {
           
           // Log stock change to history
           await addDoc(collection(db, 'stockHistory'), {
-            productId: product.productId,
-            productName: product.name,
+            productId: product.id || '',
+            productName: product.name || 'Unknown Product',
             oldStock,
             newStock,
             change: newStock - oldStock,
@@ -528,6 +532,25 @@ const AdminDashboard = () => {
       } catch (err) {
         console.error("Error deleting coupon:", err);
       }
+    }
+  };
+  
+  // User Delete Handlers
+  const handleDeleteUserClick = (user) => {
+    setUserToDelete(user);
+    setDeleteUserModalOpen(true);
+  };
+
+  const handleDeleteUserConfirm = async () => {
+    try {
+      await deleteDoc(doc(db, 'users', userToDelete.id));
+      await logActivity('DELETE_USER', `Deleted user: ${userToDelete.email}`);
+      setDeleteUserModalOpen(false);
+      setUsers(users.filter(u => u.id !== userToDelete.id));
+      setUserToDelete(null);
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      alert("Error deleting user: " + err.message);
     }
   };
 
@@ -1550,6 +1573,7 @@ const AdminDashboard = () => {
                       <th>Name</th>
                       <th>Joined</th>
                       <th>Role</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1562,6 +1586,9 @@ const AdminDashboard = () => {
                           <span className={`role-badge ${user.role || 'user'}`}>
                             {user.role || 'User'}
                           </span>
+                        </td>
+                        <td>
+                          <button className="delete-btn" onClick={() => handleDeleteUserClick(user)}>🗑️ Delete</button>
                         </td>
                       </tr>
                     ))}
@@ -1706,6 +1733,42 @@ const AdminDashboard = () => {
               </button>
               <button className="btn-delete-confirm" onClick={handleDeleteConfirm}>
                 Delete Product
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Delete User Confirmation Modal */}
+      {deleteUserModalOpen && (
+        <div className="modal-overlay" onClick={() => setDeleteUserModalOpen(false)}>
+          <div className="modal-content modal-delete" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Confirm User Deletion</h2>
+              <button className="modal-close" onClick={() => setDeleteUserModalOpen(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="delete-warning">
+                <span className="warning-icon">⚠️</span>
+                <p>Are you sure you want to delete this user?</p>
+              </div>
+              {userToDelete && (
+                <div className="product-delete-info">
+                  <div className="delete-product-details">
+                    <p><strong>Email:</strong> {userToDelete.email}</p>
+                    <p><strong>Name:</strong> {userToDelete.name || 'N/A'}</p>
+                    <p><strong>Role:</strong> {userToDelete.role || 'User'}</p>
+                  </div>
+                </div>
+              )}
+              <p className="delete-note">This action cannot be undone. All user data including orders, cart, and wishlist will remain.</p>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setDeleteUserModalOpen(false)}>
+                Cancel
+              </button>
+              <button className="btn-delete-confirm" onClick={handleDeleteUserConfirm}>
+                Delete User
               </button>
             </div>
           </div>
