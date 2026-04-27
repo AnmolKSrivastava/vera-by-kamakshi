@@ -10,7 +10,7 @@ service cloud.firestore {
     
     function isAdmin() {
       return isSignedIn() && 
-             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+             exists(/databases/$(database)/documents/admin/$(request.auth.token.email));
     }
     
     function isOwner(userId) {
@@ -23,9 +23,10 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Admin users - Admin only
-    match /admins/{userId} {
-      allow read, write: if isAdmin();
+    // Admin collection (email-based) - Read for authenticated users, write disabled
+    match /admin/{email} {
+      allow read: if isSignedIn();
+      allow write: if false;
     }
     
     // User data - Owner or admin

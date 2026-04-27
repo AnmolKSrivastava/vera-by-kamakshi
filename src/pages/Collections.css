@@ -21,16 +21,16 @@
   width: 100%;
   max-width: calc(100vw - 48px);
   min-width: 0;
-  min-height: calc(100vh - 180px);
+  min-height: calc(100vh - 80px - 180px); /* Account for header height */
   height: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   background: #ffffff;
-  padding: 5rem 1.5rem 2rem 1.5rem;
+  padding: 3rem 1.5rem 2rem 1.5rem;
   box-sizing: border-box;
-  margin: 24px auto 0 auto;
+  margin: 0 auto;
   border-radius: 0;
   box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.07);
 }

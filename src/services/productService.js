@@ -1,5 +1,5 @@
 // src/services/productService.js
-import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 export const productService = {
@@ -17,35 +17,6 @@ export const productService = {
     } catch (error) {
       console.error('Error fetching products:', error);
       throw error;
-    }
-  },
-
-  /**
-   * Real-time listener for all products
-   * @param {Function} callback - Callback function to receive products array
-   * @param {Function} onError - Optional error callback
-   * @returns {Function} Unsubscribe function
-   */
-  subscribeToAll(callback, onError) {
-    try {
-      const unsubscribe = onSnapshot(
-        collection(db, 'products'),
-        (querySnapshot) => {
-          const products = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          callback(products);
-        },
-        (error) => {
-          console.error('Error in products listener:', error);
-          if (onError) onError(error);
-        }
-      );
-      return unsubscribe;
-    } catch (error) {
-      console.error('Error setting up products listener:', error);
-      return () => {};
     }
   },
 

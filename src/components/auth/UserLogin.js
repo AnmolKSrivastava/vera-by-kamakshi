@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import './UserLogin.css';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
+import { isAdmin } from '../../services/adminService';
 
 const UserLogin = ({ isOpen, onClose }) => {
   const { user } = useAuth();
   const [loginMethod, setLoginMethod] = useState('google'); // Default to 'google' since phone needs setup
+  // Removed unused checkingAdmin state
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState(1); // 1: enter phone, 2: enter OTP
@@ -33,26 +35,36 @@ const UserLogin = ({ isOpen, onClose }) => {
     e.preventDefault();
     setError('');
     setMessage('');
-    
+    // removed setCheckingAdmin
     // Validate phone number format
     if (!phoneNumber.match(/^\+91\d{10}$/)) {
       setError('Please enter a valid Indian phone number with +91');
+      // removed setCheckingAdmin
       return;
     }
 
     setLoading(true);
-    
     try {
+      // Check if phone number is registered as admin
+      // Assume admin emails are used for admin login, so check if any admin email matches this phone number (if you store phone numbers for admins, adjust this logic)
+      // If admin phone numbers are not stored, skip this check
+      // If admin emails are used as phone numbers, check accordingly
+      // Here, we check if the phone number matches any admin email (unlikely, but for completeness)
+      const adminEmails = await import('../../services/adminService').then(mod => mod.fetchAdminEmails());
+      if (adminEmails && adminEmails.length > 0 && adminEmails.includes(phoneNumber)) {
+        setError('This phone number is registered as an admin and cannot be used for user login.');
+        setLoading(false);
+        // removed setCheckingAdmin
+        return;
+      }
       const confirmation = await authService.signInWithPhone(phoneNumber, 'recaptcha-container');
       setConfirmationResult(confirmation);
       setStep(2);
       setMessage('OTP sent successfully!');
     } catch (err) {
       console.error('Error sending OTP:', err);
-      
       // User-friendly error messages
       let errorMessage = 'Failed to send OTP. Please try again.';
-      
       if (err.message === 'TIMEOUT') {
         errorMessage = 'Phone authentication is not properly configured in Firebase. Please use Google sign-in instead or contact support.';
       } else if (err.code === 'auth/billing-not-enabled') {
@@ -64,11 +76,11 @@ const UserLogin = ({ isOpen, onClose }) => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
       setError(errorMessage);
       authService.cleanupRecaptcha();
     }
     setLoading(false);
+    // removed setCheckingAdmin
   }
 
   // Verify OTP
@@ -110,8 +122,22 @@ const UserLogin = ({ isOpen, onClose }) => {
     setError('');
     setMessage('');
     setLoading(true);
-    
+    // removed setCheckingAdmin
     try {
+      // Get email from Google popup before proceeding
+      const result = await authService.signInWithGoogle({ onlyGetUser: true });
+      const email = result?.user?.email;
+      if (!email) throw new Error('No email found from Google account.');
+      const admin = await isAdmin(email);
+      if (admin) {
+        setError('This email is registered as an admin and cannot be used for user login.');
+        setLoading(false);
+        // removed setCheckingAdmin
+        // Optionally sign out the user if already signed in
+        if (result?.user) await authService.signOut();
+        return;
+      }
+      // Proceed with normal sign-in
       await authService.signInWithGoogle();
       setMessage('Sign in successful!');
       setTimeout(() => {
@@ -120,9 +146,7 @@ const UserLogin = ({ isOpen, onClose }) => {
       }, 500);
     } catch (err) {
       console.error('Google sign-in error:', err);
-      
       let errorMessage = 'Failed to sign in with Google';
-      
       if (err.code === 'auth/popup-closed-by-user') {
         errorMessage = 'Sign-in cancelled. Please try again.';
       } else if (err.code === 'auth/popup-blocked') {
@@ -134,10 +158,10 @@ const UserLogin = ({ isOpen, onClose }) => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
       setError(errorMessage);
     }
     setLoading(false);
+    // removed setCheckingAdmin
   };
 
   const resetForm = () => {

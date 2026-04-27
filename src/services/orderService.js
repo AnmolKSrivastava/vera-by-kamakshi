@@ -1,6 +1,6 @@
 // Order Service: Handles Firestore order operations
 import { db } from '../config/firebase';
-import { collection, addDoc, getDocs, getDoc, doc, updateDoc, query, where, orderBy, Timestamp, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, getDocs, getDoc, doc, updateDoc, query, where, orderBy, Timestamp } from 'firebase/firestore';
 
 const ORDERS_COLLECTION = 'orders';
 
@@ -71,24 +71,6 @@ export const getAllOrders = async () => {
   const q = query(collection(db, ORDERS_COLLECTION), orderBy('createdAt', 'desc'));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-};
-
-// Real-time listener for all orders (admin)
-export const subscribeToAllOrders = (callback, onError) => {
-  const q = query(collection(db, ORDERS_COLLECTION), orderBy('createdAt', 'desc'));
-  
-  const unsubscribe = onSnapshot(q, 
-    (querySnapshot) => {
-      const orders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      callback(orders);
-    },
-    (error) => {
-      console.error('Error in orders listener:', error);
-      if (onError) onError(error);
-    }
-  );
-  
-  return unsubscribe;
 };
 
 // Get order by ID

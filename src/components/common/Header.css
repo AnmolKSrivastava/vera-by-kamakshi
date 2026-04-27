@@ -1,21 +1,25 @@
 /* Header - Luxury Minimalist Style with Backdrop Blur */
 .header-fixed {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
+  height: 80px;
   z-index: 1000;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   transition: all 0.5s ease;
+  box-sizing: border-box;
 }
 
 .header-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .header-content {
@@ -25,6 +29,7 @@
   height: 80px;
   gap: 2rem;
   position: relative;
+  box-sizing: border-box;
 }
 
 /* Logo */

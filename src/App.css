@@ -5,18 +5,58 @@ html, body, #root {
   height: 100%;
   min-height: 100vh;
   font-family: 'Playfair Display', serif !important;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
 }
 
 .app-layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
- .app-content {
+.app-content {
   flex: 1 0 auto;
-  margin-top: 80px; /* Account for fixed header */
- }
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+  min-height: calc(100vh - 80px);
+}
+
+/* Remove header spacing when header is not present (e.g., admin page) */
+.app-content.no-header {
+  min-height: 100vh;
+}
+
+/* Ensure no child elements can push content into the header */
+.app-content > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Prevent any first child from having negative top margin */
+.app-content > *:first-child {
+  margin-top: 0 !important;
+}
+
+/* Ensure header clearance on smaller screens */
+@media (max-width: 767px) {
+  .app-content {
+    min-height: calc(100vh - 80px);
+  }
+}
+
+/* Tablet and larger */
+@media (min-width: 768px) {
+  .app-content {
+    min-height: calc(100vh - 80px);
+  }
+}
 
 .footer {
   margin-top: auto;

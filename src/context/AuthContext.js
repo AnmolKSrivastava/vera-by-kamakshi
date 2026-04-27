@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
         // Check admin status
         try {
           const adminEmails = await fetchAdminEmails();
+          console.log('[AuthContext] Checking admin:', currentUser.email, adminEmails);
           setIsAdmin(adminEmails.includes(currentUser.email));
         } catch (err) {
           console.error('Error checking admin status:', err);

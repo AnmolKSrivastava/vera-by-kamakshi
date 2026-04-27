@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { subscribeToAllOrders, updateOrder } from '../../../services/orderService';
+import { getAllOrders, updateOrder } from '../../../services/orderService';
 import './AdminOrdersManagement.css';
 
 const AdminOrdersManagement = ({ onLog }) => {
@@ -13,23 +13,20 @@ const AdminOrdersManagement = ({ onLog }) => {
   const [trackingNumber, setTrackingNumber] = useState('');
 
   useEffect(() => {
-    setLoading(true);
-    
-    // Set up real-time listener for orders
-    const unsubscribe = subscribeToAllOrders(
-      (fetchedOrders) => {
-        setOrders(fetchedOrders);
-        setLoading(false);
-      },
-      (error) => {
-        console.error('Error fetching orders:', error);
-        setLoading(false);
-      }
-    );
-    
-    // Cleanup: unsubscribe when component unmounts
-    return () => unsubscribe();
+    fetchOrders();
   }, []);
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const fetchedOrders = await getAllOrders();
+      setOrders(fetchedOrders);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatDate = (timestamp) => {
     if (!timestamp) return '';
@@ -129,10 +126,9 @@ const AdminOrdersManagement = ({ onLog }) => {
     <div className="admin-orders-management">
       <div className="section-header">
         <h2>Orders Management</h2>
-        <span className="auto-refresh-badge" title="Real-time updates enabled">🔄 Auto-updating</span>
+        <button className="refresh-btn" onClick={fetchOrders}>Refresh</button>
       </div>
 
-      {/* Stats Cards */}
       <div className="orders-stats">
         <div className="stat-card">
           <div className="stat-value">{stats.total}</div>

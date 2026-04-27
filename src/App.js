@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { useState } from 'react';
 
 // Context Providers
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { AdminProvider } from './context/AdminContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -40,12 +40,12 @@ function AppContent() {
   const location = useLocation();
   const isAdminPage = location.pathname === '/admin';
   const [loginOpen, setLoginOpen] = useState(false);
-  const [adminSession, setAdminSession] = useState(false);
+  const { user, isAdmin, loading } = useAuth();
   
   return (
     <div className="app-layout">
-      <Header onLoginClick={() => setLoginOpen(true)} />
-      <div className="app-content">
+      {!isAdminPage && <Header onLoginClick={() => setLoginOpen(true)} />}
+      <div className={`app-content ${isAdminPage ? 'no-header' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/collections" element={<Collections />} />
@@ -66,8 +66,12 @@ function AppContent() {
           <Route path="/orders" element={<MyOrders />} />
           <Route path="/orders/:orderId" element={<OrderDetails />} />
           <Route path="/admin" element={
-            !adminSession ? (
-              <AdminLogin asPage={true} onLoginSuccess={() => setAdminSession(true)} />
+            loading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                Loading...
+              </div>
+            ) : !user || !isAdmin ? (
+              <AdminLogin asPage={true} />
             ) : (
               <AdminDashboard />
             )

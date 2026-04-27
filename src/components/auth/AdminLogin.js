@@ -3,7 +3,7 @@ import './Login.css';
 import { authService } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
 
-function AdminLogin({ onClose, asPage = false, onLoginSuccess }) {
+function AdminLogin({ onClose, asPage = false }) {
   const [error, setError] = React.useState(null);
   const navigate = useNavigate();
 
@@ -11,7 +11,6 @@ function AdminLogin({ onClose, asPage = false, onLoginSuccess }) {
     try {
       await authService.signInWithGoogle();
       setError(null);
-      if (onLoginSuccess) onLoginSuccess();
       navigate('/admin');
       if (onClose) onClose();
     } catch (err) {

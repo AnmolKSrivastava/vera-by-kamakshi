@@ -13,14 +13,21 @@ export const authService = {
    * Sign in with Google OAuth
    * @returns {Promise<Object>} User object
    */
-  async signInWithGoogle() {
+  /**
+   * Sign in with Google OAuth
+   * @param {Object} [options] - Optional config
+   * @param {boolean} [options.onlyGetUser] - If true, only get user info, do not create/update profile
+   * @returns {Promise<Object>} User object or result
+   */
+  async signInWithGoogle(options = {}) {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-      
+      if (options.onlyGetUser) {
+        return { user };
+      }
       // Create or update user profile
       await this.createUserProfile(user, 'google');
-      
       return user;
     } catch (error) {
       console.error('Error signing in with Google:', error);

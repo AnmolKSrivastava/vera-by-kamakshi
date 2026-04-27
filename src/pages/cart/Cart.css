@@ -2,7 +2,7 @@
 
 .cart-page {
   min-height: calc(100vh - 180px);
-  padding: 5rem 1.5rem 2rem;
+  padding: 2rem 1.5rem 2rem;
   background-color: #f8f9fa;
   display: flex;
   justify-content: center;
