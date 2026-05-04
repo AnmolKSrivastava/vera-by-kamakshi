@@ -199,7 +199,16 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error('Error placing order:', error);
-      alert('Failed to place order. Please try again.');
+      
+      // Check if it's a stock-related error
+      if (error.message && error.message.includes('Stock issues')) {
+        alert('Cannot place order:\n\n' + error.message.split('Stock issues:')[1]);
+      } else if (error.message && error.message.includes('Insufficient stock')) {
+        alert('Cannot place order: ' + error.message);
+      } else {
+        alert('Failed to place order. Please try again.');
+      }
+      
       setLoading(false);
     }
   };

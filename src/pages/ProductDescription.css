@@ -96,25 +96,31 @@
 .stock-indicator {
   display: inline-flex;
   align-items: center;
-  padding: 0.4rem 0.85rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: 1px solid transparent;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
 }
 
 .stock-indicator.available {
-  background: #d4edda;
-  color: #155724;
+  background: linear-gradient(135deg, #edf8f1, #d8f0e1);
+  color: #1d5e39;
+  border-color: rgba(29, 94, 57, 0.14);
 }
 
 .stock-indicator.low {
-  background: #fff3cd;
-  color: #856404;
+  background: linear-gradient(135deg, #fff9ea, #ffe4a3);
+  color: #6f4b00;
+  border-color: rgba(111, 75, 0, 0.14);
 }
 
 .stock-indicator.out {
-  background: #f8d7da;
-  color: #721c24;
+  background: linear-gradient(135deg, #fff1f2, #f7c9cf);
+  color: #8b1e2d;
+  border-color: rgba(139, 30, 45, 0.16);
 }
 
 .viewing-count {

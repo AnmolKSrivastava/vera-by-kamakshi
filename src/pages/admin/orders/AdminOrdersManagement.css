@@ -2,14 +2,14 @@
   padding: 20px;
 }
 
-.section-header {
+.admin-orders-management .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
 }
 
-.section-header h2 {
+.admin-orders-management .section-header h2 {
   font-size: 1.8rem;
   color: #333;
 }
@@ -63,28 +63,7 @@
   background: white;
   padding: 30px 25px;
   border-radius: 8px;
-  border-left: 4px solid #333;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.stat-card.pending {
-  border-left-color: #ffc107;
-}
-
-.stat-card.processing {
-  border-left-color: #2196f3;
-}
-
-.stat-card.shipped {
-  border-left-color: #9c27b0;
-}
-
-.stat-card.delivered {
-  border-left-color: #4caf50;
-}
-
-.stat-card.revenue {
-  border-left-color: #f44336;
 }
 
 .stat-value {
@@ -92,6 +71,31 @@
   font-weight: 700;
   color: #333;
   margin-bottom: 5px;
+}
+
+/* Stat Value Color Coding */
+.stat-card .stat-value {
+  color: #3f51b5; /* Indigo for Total Orders */
+}
+
+.stat-card.pending .stat-value {
+  color: #ffc107; /* Yellow for Pending */
+}
+
+.stat-card.processing .stat-value {
+  color: #2196f3; /* Blue for Processing */
+}
+
+.stat-card.shipped .stat-value {
+  color: #9c27b0; /* Purple for Shipped */
+}
+
+.stat-card.delivered .stat-value {
+  color: #4caf50; /* Green for Delivered */
+}
+
+.stat-card.revenue .stat-value {
+  color: #4caf50; /* Green for Revenue */
 }
 
 .stat-label {

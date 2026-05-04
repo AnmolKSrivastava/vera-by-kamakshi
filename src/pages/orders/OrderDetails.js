@@ -37,14 +37,15 @@ const OrderDetails = () => {
   };
 
   const handleCancelOrder = async () => {
-    if (window.confirm('Are you sure you want to cancel this order?')) {
+    if (window.confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
       setCancelling(true);
       try {
-        await updateOrderStatus(orderId, 'cancelled');
+        await updateOrderStatus(orderId, 'cancelled', user?.email || 'User');
         setOrder(prev => ({ ...prev, status: 'cancelled' }));
-        alert('Order cancelled successfully');
+        alert('Order cancelled successfully. Product stock has been restored.');
       } catch (error) {
-        alert('Failed to cancel order');
+        console.error('Error cancelling order:', error);
+        alert('Failed to cancel order: ' + (error.message || 'Unknown error'));
       } finally {
         setCancelling(false);
       }

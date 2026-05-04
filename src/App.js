@@ -26,6 +26,7 @@ import TermsConditions from './pages/TermsConditions';
 import FAQ from './pages/FAQ';
 import MyOrders from './pages/orders/MyOrders';
 import OrderDetails from './pages/orders/OrderDetails';
+import UserProfile from './pages/profile/UserProfile';
 import Checkout from './pages/checkout/Checkout';
 import OrderConfirmation from './pages/checkout/OrderConfirmation';
 
@@ -63,6 +64,7 @@ function AppContent() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="/orders" element={<MyOrders />} />
           <Route path="/orders/:orderId" element={<OrderDetails />} />
           <Route path="/admin" element={

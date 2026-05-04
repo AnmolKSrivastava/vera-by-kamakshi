@@ -82,6 +82,16 @@
   animation: slideIn 0.5s ease;
 }
 
+.badge-stock {
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  border: 1px solid transparent;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -110,13 +120,15 @@
 }
 
 .badge-out {
-  background: rgba(220, 53, 69, 0.95);
-  color: white;
+  background: linear-gradient(135deg, rgba(114, 28, 36, 0.96), rgba(220, 53, 69, 0.9));
+  color: #fff7f7;
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .badge-low {
-  background: rgba(255, 193, 7, 0.95);
-  color: #000;
+  background: linear-gradient(135deg, rgba(255, 248, 230, 0.96), rgba(255, 214, 102, 0.92));
+  color: #5f4300;
+  border-color: rgba(161, 107, 0, 0.2);
 }
 
 /* ========================================

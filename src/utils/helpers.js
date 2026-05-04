@@ -245,7 +245,7 @@ const MAX_RECENTLY_VIEWED = 10;
 
 /**
  * Add a product to recently viewed list
- * @param {Object} product - Product object with id, name, image, price
+ * @param {Object} product - Product object with id, name, image, price, stock
  */
 export const addToRecentlyViewed = (product) => {
   try {
@@ -263,6 +263,7 @@ export const addToRecentlyViewed = (product) => {
         image: product.image,
         price: product.price,
         category: product.category,
+        stock: product.stock,
         viewedAt: new Date().toISOString()
       },
       ...filtered

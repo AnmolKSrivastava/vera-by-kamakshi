@@ -19,9 +19,9 @@ function NewArrivals() {
       ref={sectionRef}
       className={`new-arrivals-section scroll-reveal ${isVisible ? 'is-visible' : ''}`}
     >
-      <div className="section-header">
-        <h2 className="section-title">NEW ARRIVALS</h2>
-        <p className="section-subtitle">Discover our latest collection of handcrafted bags</p>
+      <div className="home-section-header">
+        <h2 className="home-section-title">NEW ARRIVALS</h2>
+        <p className="home-section-subtitle">Discover our latest collection of handcrafted bags</p>
       </div>
       {loading ? (
         <LoadingSpinner message="Loading new arrivals..." />
@@ -71,9 +71,9 @@ function Testimonials() {
       ref={sectionRef}
       className={`testimonials-section scroll-reveal ${isVisible ? 'is-visible' : ''}`}
     >
-      <div className="section-header">
-        <h2 className="section-title">WHAT OUR CUSTOMERS SAY</h2>
-        <p className="section-subtitle">Real reviews from real customers</p>
+      <div className="home-section-header">
+        <h2 className="home-section-title">WHAT OUR CUSTOMERS SAY</h2>
+        <p className="home-section-subtitle">Real reviews from real customers</p>
       </div>
       <div className={`testimonials-grid scroll-reveal-stagger ${isVisible ? 'is-visible' : ''}`}>
         {testimonials.map((testimonial, index) => (
@@ -174,8 +174,9 @@ function Home() {
         ref={featuredRef}
         className={`featured-section scroll-reveal ${featuredVisible ? 'is-visible' : ''}`}
       >
-        <header>
+        <header className="featured-header">
           <h1 className="featured-title">OUR FEATURED COLLECTION</h1>
+          <p className="featured-subtitle">Signature handbags chosen for timeless design and everyday elegance</p>
         </header>
         {loading ? (
           <LoadingSpinner message="Loading featured products..." />

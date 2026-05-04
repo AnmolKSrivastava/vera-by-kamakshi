@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { productService } from "../../services/productService";
 import { storageService } from "../../services/storageService";
+import { getAnalyticsData, getGrowthMetrics } from "../../services/orderService";
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from "../../config/firebase";
 import { useAuth } from "../../context/AuthContext";
@@ -75,14 +76,35 @@ const AdminDashboard = () => {
   const [stockHistory, setStockHistory] = useState([]);
   const [bulkUpdateProducts, setBulkUpdateProducts] = useState([]);
   
+  // Products Search & Filter State
+  const [productsSearchTerm, setProductsSearchTerm] = useState('');
+  const [productsFilter, setProductsFilter] = useState('all'); // all, low-stock, out-of-stock, by-category
+  const [productsCategoryFilter, setProductsCategoryFilter] = useState('all');
+  
+  // Inventory Search & Filter State
+  const [inventorySearchTerm, setInventorySearchTerm] = useState('');
+  const [inventoryFilter, setInventoryFilter] = useState('all'); // all, low-stock, out-of-stock
+  
   // Analytics State
   const [analyticsData, setAnalyticsData] = useState({
     salesData: [],
     categoryData: [],
     topProducts: [],
     totalRevenue: 0,
-    totalOrders: 0
+    totalOrders: 0,
+    averageOrderValue: 0,
+    totalCustomers: 0,
+    newCustomers: 0,
+    repeatCustomers: 0,
+    conversionRate: 0,
+    ordersByStatus: {}
   });
+  const [analyticsDateRange, setAnalyticsDateRange] = useState(30); // 7, 30, 90, or custom
+  const [growthMetrics, setGrowthMetrics] = useState({
+    revenueGrowth: 0,
+    ordersGrowth: 0
+  });
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
 
   // Log admin activity
   const logActivity = async (action, details) => {
@@ -112,54 +134,34 @@ const AdminDashboard = () => {
   };
 
   // Fetch Analytics Data
-  const fetchAnalytics = useCallback(async (productList) => {
+  const fetchAnalytics = useCallback(async (days = 30) => {
+    setLoadingAnalytics(true);
     try {
-      // For now, generate mock analytics data from products
-      // In production, this would query orders collection
-      const categoryBreakdown = {};
-      productList.forEach(p => {
-        const cat = p.category || 'Uncategorized';
-        if (!categoryBreakdown[cat]) {
-          categoryBreakdown[cat] = { name: cat, value: 0, count: 0 };
-        }
-        categoryBreakdown[cat].value += (p.price || 0);
-        categoryBreakdown[cat].count += 1;
-      });
+      // Fetch real analytics data from orders
+      const data = await getAnalyticsData(days);
+      setAnalyticsData(data);
       
-      const categoryData = Object.values(categoryBreakdown);
-      
-      // Mock sales data for last 30 days
-      const salesData = [];
-      for (let i = 29; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        salesData.push({
-          date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          revenue: Math.floor(Math.random() * 50000) + 10000,
-          orders: Math.floor(Math.random() * 20) + 5
-        });
-      }
-      
-      // Top products by stock value
-      const topProducts = [...productList]
-        .filter(p => p.stock > 0)
-        .sort((a, b) => (b.price * b.stock) - (a.price * a.stock))
-        .slice(0, 5)
-        .map(p => ({
-          name: p.name.length > 20 ? p.name.substring(0, 20) + '...' : p.name,
-          value: p.price * p.stock,
-          stock: p.stock
-        }));
-      
-      setAnalyticsData({
-        salesData,
-        categoryData,
-        topProducts,
-        totalRevenue: salesData.reduce((sum, d) => sum + d.revenue, 0),
-        totalOrders: salesData.reduce((sum, d) => sum + d.orders, 0)
-      });
+      // Fetch growth metrics
+      const growth = await getGrowthMetrics(days);
+      setGrowthMetrics(growth);
     } catch (err) {
       console.error('Error fetching analytics:', err);
+      // Fallback to empty data if error
+      setAnalyticsData({
+        salesData: [],
+        categoryData: [],
+        topProducts: [],
+        totalRevenue: 0,
+        totalOrders: 0,
+        averageOrderValue: 0,
+        totalCustomers: 0,
+        newCustomers: 0,
+        repeatCustomers: 0,
+        conversionRate: 0,
+        ordersByStatus: {}
+      });
+    } finally {
+      setLoadingAnalytics(false);
     }
   }, []);
 
@@ -232,16 +234,18 @@ const AdminDashboard = () => {
           const couponsList = couponsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setCoupons(couponsList);
           
-          fetchAnalytics(productList);
+          fetchAnalytics(analyticsDateRange);
         } catch (err) {
           console.error("Error fetching dashboard data:", err);
         }
         setLoadingProducts(false);
+      } else if (activeSection === "analytics") {
+        fetchAnalytics(analyticsDateRange);
       }
     };
     
     fetchData();
-  }, [activeSection, fetchAnalytics]);
+  }, [activeSection, fetchAnalytics, analyticsDateRange]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -251,9 +255,17 @@ const AdminDashboard = () => {
   const handleBulkStockUpdate = async () => {
     try {
       for (const product of bulkUpdateProducts) {
-        if (product.newStock !== undefined && product.newStock !== product.stock) {
+        if (product.addStock !== undefined && product.addStock !== 0) {
           const oldStock = Number(product.stock) || 0;
-          const newStock = Number(product.newStock) || 0;
+          const stockToAdd = Number(product.addStock) || 0;
+          
+          // Only allow positive stock additions
+          if (stockToAdd <= 0) {
+            alert(`Cannot reduce stock for ${product.name}: Stock reduction happens automatically through orders. Please enter a positive number to add stock.`);
+            continue;
+          }
+          
+          const newStock = oldStock + stockToAdd;
           
           // Update product stock
           await updateDoc(doc(db, 'products', product.id), {
@@ -267,33 +279,45 @@ const AdminDashboard = () => {
             productName: product.name || 'Unknown Product',
             oldStock,
             newStock,
-            change: newStock - oldStock,
-            reason: 'Bulk Update',
+            change: stockToAdd,
+            reason: 'Stock Addition',
             updatedBy: user?.email || 'Admin',
             timestamp: new Date().toISOString()
           });
           
-          await logActivity('STOCK_UPDATE', `Updated stock for ${product.name}: ${oldStock} → ${newStock}`);
+          await logActivity('STOCK_UPDATE', `Updated stock for ${product.name}: ${oldStock} +${stockToAdd} = ${newStock}`);
         }
       }
+
+      const [productList, stockHistorySnapshot] = await Promise.all([
+        productService.getAll(),
+        getDocs(collection(db, 'stockHistory'))
+      ]);
+
+      setProducts(productList);
+      setStockHistory(
+        stockHistorySnapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+          .slice(0, 100)
+      );
       
       alert('Stock updated successfully!');
       setBulkUpdateProducts([]);
-      // Real-time listeners will auto-update the data
     } catch (err) {
       console.error('Error updating stock:', err);
       alert('Error updating stock: ' + err.message);
     }
   };
   
-  const handleStockChange = (productId, newStock) => {
+  const handleStockChange = (productId, addStock) => {
     setBulkUpdateProducts(prev => {
       const existing = prev.find(p => p.id === productId);
       if (existing) {
-        return prev.map(p => p.id === productId ? { ...p, newStock: Number(newStock) } : p);
+        return prev.map(p => p.id === productId ? { ...p, addStock: Number(addStock) } : p);
       } else {
         const product = products.find(p => p.id === productId);
-        return [...prev, { ...product, newStock: Number(newStock) }];
+        return [...prev, { ...product, addStock: Number(addStock) }];
       }
     });
   };
@@ -308,6 +332,72 @@ const AdminDashboard = () => {
 
   const handleRemoveColor = (idx) => {
     setColors(colors => colors.filter((_, i) => i !== idx));
+  };
+
+  // Filter Products for Products Section
+  const getFilteredProducts = () => {
+    let filtered = [...products];
+    
+    // Apply search filter
+    if (productsSearchTerm.trim()) {
+      const search = productsSearchTerm.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name?.toLowerCase().includes(search) ||
+        product.productId?.toLowerCase().includes(search) ||
+        product.category?.toLowerCase().includes(search) ||
+        product.brand?.toLowerCase().includes(search)
+      );
+    }
+    
+    // Apply category filter
+    if (productsCategoryFilter !== 'all') {
+      filtered = filtered.filter(p => p.category === productsCategoryFilter);
+    }
+    
+    // Apply stock filter
+    if (productsFilter === 'low-stock') {
+      filtered = filtered.filter(p => {
+        const stock = Number(p.stock) || 0;
+        return stock > 0 && stock <= 10;
+      });
+    } else if (productsFilter === 'out-of-stock') {
+      filtered = filtered.filter(p => {
+        const stock = Number(p.stock) || 0;
+        return stock === 0;
+      });
+    }
+    
+    return filtered;
+  };
+
+  // Filter Products for Inventory Section
+  const getFilteredInventoryProducts = () => {
+    let filtered = [...products];
+    
+    // Apply search filter
+    if (inventorySearchTerm.trim()) {
+      const search = inventorySearchTerm.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name?.toLowerCase().includes(search) ||
+        product.productId?.toLowerCase().includes(search) ||
+        product.category?.toLowerCase().includes(search)
+      );
+    }
+    
+    // Apply stock filter
+    if (inventoryFilter === 'low-stock') {
+      filtered = filtered.filter(p => {
+        const stock = Number(p.stock) || 0;
+        return stock > 0 && stock <= 10;
+      });
+    } else if (inventoryFilter === 'out-of-stock') {
+      filtered = filtered.filter(p => {
+        const stock = Number(p.stock) || 0;
+        return stock === 0;
+      });
+    }
+    
+    return filtered;
   };
 
   const handleImageChange = (e) => {
@@ -437,14 +527,22 @@ const AdminDashboard = () => {
     setEditingProduct(product);
     setForm({
       productId: product.productId || '',
+      sku: product.sku || '',
       name: product.name || '',
+      slug: product.slug || '',
       price: product.price || '',
-      imageUrl: product.image || '',
+      salePrice: product.salePrice || '',
+      imageUrl: product.image || product.imageUrl || '',
       description: product.description || '',
       stock: product.stock || 0,
-      category: product.category || ''
+      category: product.category || '',
+      brand: product.brand || '',
+      featured: product.featured || false,
+      material: product.material || '',
+      countryOfOrigin: product.countryOfOrigin || ''
     });
     setColors(product.colors || ['#000000']);
+    setImagePreview(product.image || product.imageUrl || '');
     setEditModalOpen(true);
   };
 
@@ -459,13 +557,20 @@ const AdminDashboard = () => {
       }
       const updatedProduct = {
         productId: form.productId,
+        sku: form.sku || '',
         name: form.name,
+        slug: form.slug || form.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
         price: Number(form.price),
+        salePrice: form.salePrice ? Number(form.salePrice) : null,
         image: imageUrl,
         imageUrl: imageUrl,
         description: form.description || '',
         stock: Number(form.stock) || 0,
         category: form.category || 'Uncategorized',
+        brand: form.brand || '',
+        featured: form.featured || false,
+        material: form.material || '',
+        countryOfOrigin: form.countryOfOrigin || '',
         colors: colors.map(c => c.trim()).filter(Boolean)
       };
       await productService.update(editingProduct.id, updatedProduct);
@@ -554,6 +659,63 @@ const AdminDashboard = () => {
     }
   };
 
+  // Export analytics data to CSV
+  const exportAnalyticsCSV = () => {
+    const csvRows = [];
+    
+    // Header
+    csvRows.push('Analytics Report - ' + new Date().toLocaleDateString());
+    csvRows.push('Date Range: Last ' + analyticsDateRange + ' days');
+    csvRows.push('');
+    
+    // Summary metrics
+    csvRows.push('SUMMARY METRICS');
+    csvRows.push('Metric,Value');
+    csvRows.push(`Total Revenue,₹${analyticsData.totalRevenue.toLocaleString()}`);
+    csvRows.push(`Total Orders,${analyticsData.totalOrders}`);
+    csvRows.push(`Average Order Value,₹${Math.round(analyticsData.averageOrderValue).toLocaleString()}`);
+    csvRows.push(`Total Customers,${analyticsData.totalCustomers}`);
+    csvRows.push(`New Customers,${analyticsData.newCustomers}`);
+    csvRows.push(`Repeat Customers,${analyticsData.repeatCustomers}`);
+    csvRows.push(`Revenue Growth,${growthMetrics.revenueGrowth}%`);
+    csvRows.push(`Orders Growth,${growthMetrics.ordersGrowth}%`);
+    csvRows.push('');
+    
+    // Daily sales
+    csvRows.push('DAILY SALES');
+    csvRows.push('Date,Revenue,Orders');
+    analyticsData.salesData.forEach(day => {
+      csvRows.push(`${day.date},${day.revenue},${day.orders}`);
+    });
+    csvRows.push('');
+    
+    // Category breakdown
+    csvRows.push('CATEGORY BREAKDOWN');
+    csvRows.push('Category,Revenue,Items Sold');
+    analyticsData.categoryData.forEach(cat => {
+      csvRows.push(`${cat.name},${cat.value},${cat.count}`);
+    });
+    csvRows.push('');
+    
+    // Top products
+    csvRows.push('TOP PRODUCTS');
+    csvRows.push('Product,Revenue,Quantity');
+    analyticsData.topProducts.forEach(prod => {
+      csvRows.push(`${prod.name},${prod.value},${prod.quantity || 0}`);
+    });
+    
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `analytics-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="admin-dashboard">
       <aside className="admin-sidebar">
@@ -631,42 +793,36 @@ const AdminDashboard = () => {
             {/* Dashboard Statistics */}
             <div className="dashboard-stats">
               <div className="stat-card">
-                <div className="stat-icon">📦</div>
-                <div className="stat-content">
-                  <div className="stat-value">{products.length}</div>
-                  <div className="stat-label">Total Products</div>
-                </div>
+                <div className="stat-label">Total Products</div>
+                <div className="stat-value products">{products.length}</div>
               </div>
               <div className="stat-card">
-                <div className="stat-icon">👥</div>
-                <div className="stat-content">
-                  <div className="stat-value">{users.length}</div>
-                  <div className="stat-label">Total Users</div>
-                </div>
+                <div className="stat-label">Total Users</div>
+                <div className="stat-value users">{users.length}</div>
               </div>
               <div className="stat-card">
-                <div className="stat-icon">🎫</div>
-                <div className="stat-content">
-                  <div className="stat-value">{coupons.length}</div>
-                  <div className="stat-label">Active Coupons</div>
-                </div>
+                <div className="stat-label">Active Coupons</div>
+                <div className="stat-value coupons">{coupons.length}</div>
               </div>
               <div className="stat-card">
-                <div className="stat-icon">📊</div>
-                <div className="stat-content">
-                  <div className="stat-value">
-                    {products.reduce((sum, p) => sum + (p.stock || 0), 0)}
-                  </div>
-                  <div className="stat-label">Total Stock</div>
+                <div className="stat-label">Total Stock</div>
+                <div className="stat-value stock">
+                  {products.reduce((sum, p) => sum + (Number(p.stock) || 0), 0)}
                 </div>
               </div>
             </div>
 
             {/* Low Stock Alert */}
-            {products.filter(p => (p.stock || 0) < 5 && (p.stock || 0) > 0).length > 0 && (
+            {products.filter(p => {
+              const stock = Number(p.stock) || 0;
+              return stock <= 10 && stock > 0;
+            }).length > 0 && (
               <div className="alert-box warning">
                 <strong>⚠️ Low Stock Alert:</strong> 
-                {products.filter(p => (p.stock || 0) < 5 && (p.stock || 0) > 0).length} products have low stock
+                {products.filter(p => {
+                  const stock = Number(p.stock) || 0;
+                  return stock <= 10 && stock > 0;
+                }).length} products have low stock
               </div>
             )}
 
@@ -998,10 +1154,61 @@ const AdminDashboard = () => {
           <div className="products-list-section">
             <h1 className="admin-title">Products Management</h1>
             
+            {/* Search and Filter Controls */}
+            {!loadingProducts && products.length > 0 && (
+              <div className="products-controls">
+                <div className="search-filter-row">
+                  <input
+                    type="text"
+                    placeholder="Search by name, ID, category, brand..."
+                    className="search-input"
+                    value={productsSearchTerm}
+                    onChange={(e) => setProductsSearchTerm(e.target.value)}
+                  />
+                  <select
+                    className="category-filter"
+                    value={productsCategoryFilter}
+                    onChange={(e) => setProductsCategoryFilter(e.target.value)}
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="Handbags">Handbags</option>
+                    <option value="Wallets">Wallets</option>
+                    <option value="Clutches">Clutches</option>
+                    <option value="Totes">Totes</option>
+                    <option value="Crossbody">Crossbody</option>
+                    <option value="Backpacks">Backpacks</option>
+                    <option value="Satchels">Satchels</option>
+                  </select>
+                </div>
+                <div className="filter-buttons">
+                  <button
+                    className={`filter-btn ${productsFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setProductsFilter('all')}
+                  >
+                    All Products
+                  </button>
+                  <button
+                    className={`filter-btn ${productsFilter === 'low-stock' ? 'active' : ''}`}
+                    onClick={() => setProductsFilter('low-stock')}
+                  >
+                    Low Stock (≤10)
+                  </button>
+                  <button
+                    className={`filter-btn ${productsFilter === 'out-of-stock' ? 'active' : ''}`}
+                    onClick={() => setProductsFilter('out-of-stock')}
+                  >
+                    Out of Stock
+                  </button>
+                </div>
+              </div>
+            )}
+            
             {loadingProducts ? (
               <div className="loading-state">Loading products...</div>
             ) : products.length === 0 ? (
               <div className="empty-state">No products found. Add a product from the Dashboard section.</div>
+            ) : getFilteredProducts().length === 0 ? (
+              <div className="empty-state">No products match your search criteria.</div>
             ) : (
               <div className="products-table-container">
                 <table className="products-table">
@@ -1018,8 +1225,10 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {products.map((product) => (
-                      <tr key={product.id} className={product.stock < 5 ? 'low-stock-row' : ''}>
+                    {getFilteredProducts().map((product) => {
+                      const stock = Number(product.stock) || 0;
+                      return (
+                      <tr key={product.id} className={stock <= 10 ? 'low-stock-row' : ''}>
                         <td>
                           <img 
                             src={product.image} 
@@ -1031,8 +1240,8 @@ const AdminDashboard = () => {
                         <td>{product.name}</td>
                         <td>₹{product.price}</td>
                         <td>
-                          <span className={`stock-badge ${product.stock < 5 ? 'low' : product.stock < 10 ? 'medium' : 'high'}`}>
-                            {product.stock || 0}
+                          <span className={`stock-badge ${stock <= 10 ? 'low' : stock <= 20 ? 'medium' : 'high'}`}>
+                            {stock}
                           </span>
                         </td>
                         <td>{product.category || 'N/A'}</td>
@@ -1055,7 +1264,8 @@ const AdminDashboard = () => {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -1188,137 +1398,241 @@ const AdminDashboard = () => {
 
         {activeSection === "analytics" && (
           <div className="analytics-section">
-            <h1 className="admin-title">Sales Analytics & Reports</h1>
+            <div className="analytics-header">
+              <h1 className="admin-title">Sales Analytics & Reports</h1>
+              <div className="analytics-controls">
+                <select 
+                  className="date-range-select" 
+                  value={analyticsDateRange}
+                  onChange={(e) => setAnalyticsDateRange(Number(e.target.value))}
+                >
+                  <option value={7}>Last 7 Days</option>
+                  <option value={30}>Last 30 Days</option>
+                  <option value={90}>Last 90 Days</option>
+                </select>
+                <button className="export-btn" onClick={exportAnalyticsCSV} title="Export to CSV">
+                  📥 Export Report
+                </button>
+              </div>
+            </div>
             
-            {/* Key Metrics */}
-            <div className="analytics-metrics">
-              <div className="metric-card">
-                <div className="metric-icon">💰</div>
-                <div className="metric-content">
-                  <div className="metric-value">₹{analyticsData.totalRevenue.toLocaleString()}</div>
-                  <div className="metric-label">Total Revenue (30 days)</div>
-                </div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-icon">📦</div>
-                <div className="metric-content">
-                  <div className="metric-value">{analyticsData.totalOrders}</div>
-                  <div className="metric-label">Total Orders (30 days)</div>
-                </div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-icon">📈</div>
-                <div className="metric-content">
-                  <div className="metric-value">
-                    ₹{analyticsData.totalOrders > 0 ? Math.round(analyticsData.totalRevenue / analyticsData.totalOrders).toLocaleString() : 0}
+            {loadingAnalytics ? (
+              <div className="analytics-loading">Loading analytics data...</div>
+            ) : (
+              <>
+                {/* Key Metrics with Growth Indicators */}
+                <div className="analytics-metrics">
+                  <div className="metric-card">
+                    <div className="metric-label">Total Revenue ({analyticsDateRange} days)</div>
+                    <div className="metric-value revenue">₹{analyticsData.totalRevenue.toLocaleString()}</div>
+                    {growthMetrics.revenueGrowth !== 0 && (
+                      <div className={`growth-indicator ${growthMetrics.revenueGrowth > 0 ? 'positive' : 'negative'}`}>
+                        {growthMetrics.revenueGrowth > 0 ? '↑' : '↓'} {Math.abs(growthMetrics.revenueGrowth)}%
+                      </div>
+                    )}
                   </div>
-                  <div className="metric-label">Average Order Value</div>
-                </div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-icon">🛍️</div>
-                <div className="metric-content">
-                  <div className="metric-value">
-                    ₹{products.length > 0 ? Math.round(products.reduce((sum, p) => sum + (p.price || 0) * (p.stock || 0), 0)).toLocaleString() : 0}
+                  <div className="metric-card">
+                    <div className="metric-label">Total Orders ({analyticsDateRange} days)</div>
+                    <div className="metric-value orders">{analyticsData.totalOrders}</div>
+                    {growthMetrics.ordersGrowth !== 0 && (
+                      <div className={`growth-indicator ${growthMetrics.ordersGrowth > 0 ? 'positive' : 'negative'}`}>
+                        {growthMetrics.ordersGrowth > 0 ? '↑' : '↓'} {Math.abs(growthMetrics.ordersGrowth)}%
+                      </div>
+                    )}
                   </div>
-                  <div className="metric-label">Total Inventory Value</div>
+                  <div className="metric-card">
+                    <div className="metric-label">Average Order Value</div>
+                    <div className="metric-value value">₹{Math.round(analyticsData.averageOrderValue).toLocaleString()}</div>
+                  </div>
+                  <div className="metric-card">
+                    <div className="metric-label">Total Customers</div>
+                    <div className="metric-value users">{analyticsData.totalCustomers}</div>
+                    <div className="metric-subtext">
+                      {analyticsData.newCustomers} new, {analyticsData.repeatCustomers} returning
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Charts Row 1 */}
-            <div className="charts-row">
-              <div className="chart-container">
-                <h3 className="chart-title">Sales & Orders Trend (Last 30 Days)</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={analyticsData.salesData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip />
-                    <Legend />
-                    <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="#030213" strokeWidth={2} name="Revenue (₹)" />
-                    <Line yAxisId="right" type="monotone" dataKey="orders" stroke="#82ca9d" strokeWidth={2} name="Orders" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+                {/* Customer Insights */}
+                <div className="customer-insights-row">
+                  <div className="insight-card">
+                    <h3>Customer Retention</h3>
+                    <div className="insight-value">{analyticsData.conversionRate.toFixed(1)}%</div>
+                    <div className="insight-label">Repeat Customer Rate</div>
+                  </div>
+                  <div className="insight-card">
+                    <h3>Order Status Breakdown</h3>
+                    <div className="status-breakdown">
+                      <div className="status-item">
+                        <span className="status-dot pending"></span>
+                        <span>Pending: {analyticsData.ordersByStatus?.pending || 0}</span>
+                      </div>
+                      <div className="status-item">
+                        <span className="status-dot processing"></span>
+                        <span>Processing: {analyticsData.ordersByStatus?.processing || 0}</span>
+                      </div>
+                      <div className="status-item">
+                        <span className="status-dot shipped"></span>
+                        <span>Shipped: {analyticsData.ordersByStatus?.shipped || 0}</span>
+                      </div>
+                      <div className="status-item">
+                        <span className="status-dot delivered"></span>
+                        <span>Delivered: {analyticsData.ordersByStatus?.delivered || 0}</span>
+                      </div>
+                      <div className="status-item">
+                        <span className="status-dot cancelled"></span>
+                        <span>Cancelled: {analyticsData.ordersByStatus?.cancelled || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Charts Row 2 */}
-            <div className="charts-row">
-              <div className="chart-container half">
-                <h3 className="chart-title">Sales by Category</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={analyticsData.categoryData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      label={(entry) => `${entry.name} (${entry.count})`}
-                    >
-                      {analyticsData.categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={['#030213', '#2c2c2c', '#4a4a4a', '#666666', '#858585', '#a3a3a3'][index % 6]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              
-              <div className="chart-container half">
-                <h3 className="chart-title">Top Products by Inventory Value</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={analyticsData.topProducts}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
-                    <Bar dataKey="value" fill="#030213" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+                {/* Charts Row 1 */}
+                <div className="charts-row">
+                  <div className="chart-container">
+                    <h3 className="chart-title">Sales & Orders Trend (Last {analyticsDateRange} Days)</h3>
+                    <ResponsiveContainer width="100%" height={350}>
+                      <LineChart data={analyticsData.salesData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 12 }}
+                          stroke="#666"
+                        />
+                        <YAxis 
+                          yAxisId="left" 
+                          tick={{ fontSize: 12 }}
+                          stroke="#666"
+                          label={{ value: 'Revenue (₹)', angle: -90, position: 'insideLeft' }}
+                        />
+                        <YAxis 
+                          yAxisId="right" 
+                          orientation="right" 
+                          tick={{ fontSize: 12 }}
+                          stroke="#666"
+                          label={{ value: 'Orders', angle: 90, position: 'insideRight' }}
+                        />
+                        <Tooltip 
+                          contentStyle={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}
+                          formatter={(value, name) => [
+                            name === 'Revenue (₹)' ? `₹${value.toLocaleString()}` : value,
+                            name
+                          ]}
+                        />
+                        <Legend />
+                        <Line 
+                          yAxisId="left" 
+                          type="monotone" 
+                          dataKey="revenue" 
+                          stroke="#030213" 
+                          strokeWidth={3} 
+                          name="Revenue (₹)"
+                          dot={{ fill: '#030213', r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                        <Line 
+                          yAxisId="right" 
+                          type="monotone" 
+                          dataKey="orders" 
+                          stroke="#82ca9d" 
+                          strokeWidth={3} 
+                          name="Orders"
+                          dot={{ fill: '#82ca9d', r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
 
-            {/* Products Performance Table */}
-            <div className="performance-table-section">
-              <h3>Products Performance Overview</h3>
-              <table className="performance-table">
-                <thead>
-                  <tr>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Stock</th>
-                    <th>Unit Price</th>
-                    <th>Stock Value</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.slice(0, 10).map((product) => {
-                    const stockValue = (product.price || 0) * (product.stock || 0);
-                    const stockStatus = product.stock === 0 ? 'Out of Stock' : product.stock < 5 ? 'Low Stock' : 'In Stock';
-                    return (
-                      <tr key={product.id}>
-                        <td>{product.name}</td>
-                        <td>{product.category || 'N/A'}</td>
-                        <td>{product.stock || 0}</td>
-                        <td>₹{product.price.toLocaleString()}</td>
-                        <td>₹{stockValue.toLocaleString()}</td>
-                        <td>
-                          <span className={`status-badge ${stockStatus.toLowerCase().replace(' ', '-')}`}>
-                            {stockStatus}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                {/* Charts Row 2 */}
+                <div className="charts-row">
+                  <div className="chart-container half">
+                    <h3 className="chart-title">Sales by Category</h3>
+                    {analyticsData.categoryData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={350}>
+                        <PieChart>
+                          <Pie
+                            data={analyticsData.categoryData}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={100}
+                            label={(entry) => `${entry.name} (${entry.count})`}
+                            labelLine={{ stroke: '#666' }}
+                          >
+                            {analyticsData.categoryData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={['#030213', '#2c2c2c', '#4a4a4a', '#666666', '#858585', '#a3a3a3'][index % 6]} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="no-data">No category data available</div>
+                    )}
+                  </div>
+                  
+                  <div className="chart-container half">
+                    <h3 className="chart-title">Top 10 Products by Revenue</h3>
+                    {analyticsData.topProducts.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={350}>
+                        <BarChart data={analyticsData.topProducts} layout="horizontal">
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis type="number" tick={{ fontSize: 11 }} />
+                          <YAxis 
+                            dataKey="name" 
+                            type="category" 
+                            width={150}
+                            tick={{ fontSize: 11 }}
+                          />
+                          <Tooltip 
+                            formatter={(value, name) => [
+                              name === 'value' ? `₹${value.toLocaleString()}` : value,
+                              name === 'value' ? 'Revenue' : name
+                            ]}
+                            contentStyle={{ background: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}
+                          />
+                          <Bar dataKey="value" fill="#030213" radius={[0, 4, 4, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="no-data">No product data available</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Products Performance Table */}
+                {analyticsData.topProducts.length > 0 && (
+                  <div className="performance-table-section">
+                    <h3>Top Products Performance</h3>
+                    <table className="performance-table">
+                      <thead>
+                        <tr>
+                          <th>Rank</th>
+                          <th>Product Name</th>
+                          <th>Revenue</th>
+                          <th>Quantity Sold</th>
+                          <th>Avg Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analyticsData.topProducts.map((product, index) => (
+                          <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td>{product.name}</td>
+                            <td>₹{product.value.toLocaleString()}</td>
+                            <td>{product.quantity || 0}</td>
+                            <td>₹{product.quantity > 0 ? Math.round(product.value / product.quantity).toLocaleString() : 0}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
 
@@ -1334,27 +1648,69 @@ const AdminDashboard = () => {
               </div>
               <div className="inventory-stat">
                 <h3>Total Units</h3>
-                <p className="stat-number">{products.reduce((sum, p) => sum + (p.stock || 0), 0)}</p>
+                <p className="stat-number">{products.reduce((sum, p) => sum + (Number(p.stock) || 0), 0)}</p>
               </div>
               <div className="inventory-stat">
                 <h3>Low Stock Items</h3>
-                <p className="stat-number warning">{products.filter(p => p.stock > 0 && p.stock < 5).length}</p>
+                <p className="stat-number warning">{products.filter(p => {
+                  const stock = Number(p.stock) || 0;
+                  return stock > 0 && stock <= 10;
+                }).length}</p>
               </div>
               <div className="inventory-stat">
                 <h3>Out of Stock</h3>
-                <p className="stat-number danger">{products.filter(p => p.stock === 0).length}</p>
+                <p className="stat-number danger">{products.filter(p => {
+                  const stock = Number(p.stock) || 0;
+                  return stock === 0;
+                }).length}</p>
               </div>
             </div>
 
             {/* Bulk Stock Update */}
             <div className="bulk-update-section">
               <h2>Bulk Stock Update</h2>
-              <p className="section-description">Update stock quantities for multiple products at once</p>
+              <p className="section-description">Add stock quantities for multiple products at once. Stock reduction happens automatically when customers place orders.</p>
               
               {loadingProducts ? (
                 <div className="loading-state">Loading products...</div>
               ) : (
                 <>
+                  {/* Search and Filter Controls */}
+                  <div className="inventory-controls">
+                    <div className="search-filter-row">
+                      <input
+                        type="text"
+                        placeholder="Search by name, ID, category..."
+                        className="search-input"
+                        value={inventorySearchTerm}
+                        onChange={(e) => setInventorySearchTerm(e.target.value)}
+                      />
+                    </div>
+                    <div className="filter-buttons">
+                      <button
+                        className={`filter-btn ${inventoryFilter === 'all' ? 'active' : ''}`}
+                        onClick={() => setInventoryFilter('all')}
+                      >
+                        All Products
+                      </button>
+                      <button
+                        className={`filter-btn ${inventoryFilter === 'low-stock' ? 'active' : ''}`}
+                        onClick={() => setInventoryFilter('low-stock')}
+                      >
+                        Low Stock (≤10)
+                      </button>
+                      <button
+                        className={`filter-btn ${inventoryFilter === 'out-of-stock' ? 'active' : ''}`}
+                        onClick={() => setInventoryFilter('out-of-stock')}
+                      >
+                        Out of Stock
+                      </button>
+                    </div>
+                  </div>
+
+                  {getFilteredInventoryProducts().length === 0 ? (
+                    <div className="empty-state">No products match your search criteria.</div>
+                  ) : (
                   <div className="bulk-update-table-container">
                     <table className="bulk-update-table">
                       <thead>
@@ -1363,15 +1719,16 @@ const AdminDashboard = () => {
                           <th>Product Name</th>
                           <th>Category</th>
                           <th>Current Stock</th>
-                          <th>New Stock</th>
-                          <th>Change</th>
+                          <th>Add Stock</th>
+                          <th>New Total</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {products.map((product) => {
+                        {getFilteredInventoryProducts().map((product) => {
                           const bulkProduct = bulkUpdateProducts.find(p => p.id === product.id);
-                          const newStock = bulkProduct?.newStock;
-                          const change = newStock !== undefined ? newStock - (product.stock || 0) : 0;
+                          const addStock = bulkProduct?.addStock || 0;
+                          const currentStock = Number(product.stock) || 0;
+                          const newTotal = currentStock + addStock;
                           
                           return (
                             <tr key={product.id}>
@@ -1379,24 +1736,25 @@ const AdminDashboard = () => {
                               <td>{product.name}</td>
                               <td>{product.category}</td>
                               <td>
-                                <span className={`stock-badge ${product.stock < 5 ? 'low' : 'high'}`}>
-                                  {product.stock || 0}
+                                <span className={`stock-badge ${currentStock <= 10 ? 'low' : 'high'}`}>
+                                  {currentStock}
                                 </span>
                               </td>
                               <td>
                                 <input
                                   type="number"
                                   className="stock-input"
+                                  placeholder="0"
                                   min="0"
-                                  placeholder={product.stock || 0}
                                   onChange={(e) => handleStockChange(product.id, e.target.value)}
-                                  value={newStock !== undefined ? newStock : ''}
+                                  value={bulkProduct ? addStock : ''}
+                                  title="Enter quantity to add to current stock"
                                 />
                               </td>
                               <td>
-                                {change !== 0 && (
-                                  <span className={`change-indicator ${change > 0 ? 'positive' : 'negative'}`}>
-                                    {change > 0 ? '+' : ''}{change}
+                                {bulkProduct && addStock !== 0 && (
+                                  <span className={`change-indicator ${addStock > 0 ? 'positive' : 'error'}`}>
+                                    {addStock > 0 ? newTotal : '❌ Enter positive number'}
                                   </span>
                                 )}
                               </td>
@@ -1406,6 +1764,7 @@ const AdminDashboard = () => {
                       </tbody>
                     </table>
                   </div>
+                  )}
                   
                   {bulkUpdateProducts.length > 0 && (
                     <div className="bulk-update-actions">
@@ -1472,47 +1831,38 @@ const AdminDashboard = () => {
             {/* Low Stock Alerts */}
             <div className="low-stock-alerts">
               <h2>Low Stock Alerts & Reorder Recommendations</h2>
-              {products.filter(p => p.stock < 5).length === 0 ? (
+              {products.filter(p => (Number(p.stock) || 0) <= 10).length === 0 ? (
                 <div className="empty-state">All products are well-stocked! 🎉</div>
               ) : (
                 <div className="alerts-grid">
                   {products
-                    .filter(p => p.stock < 5)
-                    .sort((a, b) => a.stock - b.stock)
-                    .map((product) => (
-                      <div key={product.id} className={`alert-card ${product.stock === 0 ? 'critical' : 'warning'}`}>
+                    .filter(p => (Number(p.stock) || 0) <= 10)
+                    .sort((a, b) => (Number(a.stock) || 0) - (Number(b.stock) || 0))
+                    .map((product) => {
+                      const stock = Number(product.stock) || 0;
+                      return (
+                      <div key={product.id} className={`alert-card ${stock === 0 ? 'critical' : 'warning'}`}>
                         <div className="alert-header">
-                          <span className="alert-icon">{product.stock === 0 ? '🔴' : '⚠️'}</span>
+                          <span className="alert-icon">{stock === 0 ? '🔴' : '⚠️'}</span>
                           <span className="alert-status">
-                            {product.stock === 0 ? 'OUT OF STOCK' : 'LOW STOCK'}
+                            {stock === 0 ? 'OUT OF STOCK' : 'LOW STOCK'}
                           </span>
                         </div>
                         <div className="alert-content">
                           <h4>{product.name}</h4>
                           <p><strong>Product ID:</strong> {product.productId}</p>
-                          <p><strong>Current Stock:</strong> {product.stock} units</p>
+                          <p><strong>Current Stock:</strong> {stock} units</p>
                           <p><strong>Category:</strong> {product.category}</p>
-                          {product.stock === 0 && (
+                          {stock === 0 && (
                             <p className="reorder-suggestion">⚡ Immediate reorder recommended</p>
                           )}
-                          {product.stock > 0 && product.stock < 5 && (
+                          {stock > 0 && stock <= 10 && (
                             <p className="reorder-suggestion">📋 Consider restocking soon</p>
                           )}
                         </div>
-                        <button 
-                          className="btn-quick-restock"
-                          onClick={() => {
-                            setActiveSection('inventory');
-                            setTimeout(() => {
-                              const input = document.querySelector(`input[data-product-id="${product.id}"]`);
-                              if (input) input.focus();
-                            }, 100);
-                          }}
-                        >
-                          Quick Restock
-                        </button>
                       </div>
-                    ))}
+                    );
+                    })}
                 </div>
               )}
             </div>
@@ -1616,53 +1966,114 @@ const AdminDashboard = () => {
               <button className="modal-close" onClick={() => setEditModalOpen(false)}>×</button>
             </div>
             <form className="edit-product-form" onSubmit={handleEditSubmit}>
+              
+              {/* Basic Info */}
+              <div className="form-section-title">📋 Basic Information</div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Product ID</label>
+                  <label>Product ID <span className="required">*</span></label>
                   <input
                     type="text"
-                    value={editingProduct.productId}
-                    onChange={(e) => setEditingProduct({ ...editingProduct, productId: e.target.value })}
+                    name="productId"
+                    value={form.productId}
+                    onChange={handleChange}
                     required
+                    className={form.productId ? 'valid' : ''}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Product Name</label>
+                  <label>SKU / Barcode <span className="optional">(optional)</span></label>
                   <input
                     type="text"
-                    value={editingProduct.name}
-                    onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
-                    required
+                    name="sku"
+                    value={form.sku}
+                    onChange={handleChange}
+                    placeholder="e.g., SKU123456"
                   />
                 </div>
               </div>
+              
+              <div className="form-group">
+                <label>Product Name <span className="required">*</span></label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleNameChange}
+                  required
+                  className={form.name ? 'valid' : ''}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>URL Slug <span className="optional">(auto-generated)</span></label>
+                <input
+                  type="text"
+                  name="slug"
+                  value={form.slug}
+                  onChange={handleChange}
+                  className="slug-input"
+                />
+              </div>
+
+              {/* Pricing */}
+              <div className="form-section-title">💰 Pricing</div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Price (₹)</label>
+                  <label>Regular Price (₹) <span className="required">*</span></label>
                   <input
                     type="number"
-                    value={editingProduct.price}
-                    onChange={(e) => setEditingProduct({ ...editingProduct, price: e.target.value })}
+                    name="price"
+                    value={form.price}
+                    onChange={handleChange}
                     required
                     min="0"
+                    step="0.01"
+                    className={form.price ? 'valid' : ''}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Stock Quantity</label>
+                  <label>Sale Price (₹) <span className="optional">(optional)</span></label>
                   <input
                     type="number"
-                    value={editingProduct.stock || 0}
-                    onChange={(e) => setEditingProduct({ ...editingProduct, stock: parseInt(e.target.value) })}
+                    name="salePrice"
+                    value={form.salePrice}
+                    onChange={handleChange}
                     min="0"
+                    step="0.01"
                   />
+                  {form.salePrice && form.price && Number(form.salePrice) < Number(form.price) && (
+                    <small className="discount-info">
+                      💰 {Math.round(((form.price - form.salePrice) / form.price) * 100)}% off
+                    </small>
+                  )}
                 </div>
               </div>
+
+              {/* Inventory */}
+              <div className="form-section-title">📦 Inventory & Category</div>
               <div className="form-row">
+                <div className="form-group">
+                  <label>Stock Quantity <span className="required">*</span></label>
+                  <input
+                    type="number"
+                    name="stock"
+                    value={form.stock}
+                    onChange={handleChange}
+                    min="0"
+                    className={form.stock && Number(form.stock) <= 10 ? 'warning' : form.stock ? 'valid' : ''}
+                  />
+                  {form.stock && Number(form.stock) <= 10 && Number(form.stock) > 0 && (
+                    <small className="warning-text">⚠️ Low stock warning</small>
+                  )}
+                </div>
                 <div className="form-group">
                   <label>Category</label>
                   <select
-                    value={editingProduct.category || ''}
-                    onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+                    name="category"
+                    value={form.category}
+                    onChange={handleChange}
+                    className={form.category ? 'valid' : ''}
                   >
                     <option value="">Select Category</option>
                     <option value="Handbags">Handbags</option>
@@ -1670,25 +2081,140 @@ const AdminDashboard = () => {
                     <option value="Clutches">Clutches</option>
                     <option value="Totes">Totes</option>
                     <option value="Crossbody">Crossbody</option>
+                    <option value="Backpacks">Backpacks</option>
+                    <option value="Satchels">Satchels</option>
                   </select>
                 </div>
               </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  value={editingProduct.description || ''}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
-                  rows="3"
-                ></textarea>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Brand <span className="optional">(optional)</span></label>
+                  <input
+                    type="text"
+                    name="brand"
+                    value={form.brand}
+                    onChange={handleChange}
+                    placeholder="e.g., VERA by Kamakshi"
+                  />
+                </div>
+                <div className="form-group checkbox-group">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="featured"
+                      checked={form.featured}
+                      onChange={(e) => setForm({...form, featured: e.target.checked})}
+                    />
+                    <span>⭐ Mark as Featured Product</span>
+                  </label>
+                </div>
               </div>
+
+              {/* Description */}
+              <div className="form-section-title">📝 Description & Details</div>
               <div className="form-group">
-                <label>Image URL</label>
+                <label>Description <span className="optional">(optional)</span></label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  rows="4"
+                  className={form.description ? 'valid' : ''}
+                ></textarea>
+                <small className="char-count">{form.description.length} characters</small>
+              </div>
+
+              {/* Images */}
+              <div className="form-section-title">🖼️ Images</div>
+              <div className="form-group">
+                <label>Product Image (Upload) <span className="optional">(optional)</span></label>
                 <input
-                  type="text"
-                  value={editingProduct.image || editingProduct.imageUrl || ''}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, image: e.target.value })}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="file-input"
                 />
               </div>
+              <div className="form-group">
+                <label>Or Image URL</label>
+                <input
+                  type="text"
+                  name="imageUrl"
+                  value={form.imageUrl}
+                  onChange={handleImageUrlChange}
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+              
+              {imagePreview && (
+                <div className="image-preview-container">
+                  <label>Image Preview:</label>
+                  <img src={imagePreview} alt="Preview" className="image-preview" />
+                </div>
+              )}
+
+              {/* Colors */}
+              <div className="form-section-title">🎨 Colors</div>
+              <div className="form-group">
+                <label>Available Colors</label>
+                {colors.map((color, idx) => (
+                  <div key={idx} className="color-input-row">
+                    <input
+                      type="color"
+                      value={color}
+                      onChange={e => handleColorChange(idx, e.target.value)}
+                      className="color-picker"
+                    />
+                    <input
+                      type="text"
+                      value={color}
+                      onChange={e => handleColorChange(idx, e.target.value)}
+                      placeholder="#000000"
+                      className="color-hex-input"
+                    />
+                    {colors.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveColor(idx)}
+                        className="remove-color-btn"
+                        title="Remove color"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button type="button" onClick={handleAddColor} className="add-color-btn">
+                  + Add Color
+                </button>
+              </div>
+
+              {/* Product Specifications */}
+              <div className="form-section-title">📏 Specifications</div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Material <span className="optional">(optional)</span></label>
+                  <input
+                    type="text"
+                    name="material"
+                    value={form.material}
+                    onChange={handleChange}
+                    placeholder="e.g., Genuine Leather, Canvas"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Country of Origin <span className="optional">(optional)</span></label>
+                  <input
+                    type="text"
+                    name="countryOfOrigin"
+                    value={form.countryOfOrigin}
+                    onChange={handleChange}
+                    placeholder="e.g., India, Italy"
+                  />
+                </div>
+              </div>
+
               <div className="modal-actions">
                 <button type="button" className="btn-cancel" onClick={() => setEditModalOpen(false)}>
                   Cancel

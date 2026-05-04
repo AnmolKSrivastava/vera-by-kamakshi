@@ -22,8 +22,11 @@ const ProductTile = ({ id, image, name, price, colors = [], product, stock }) =>
   
   // Determine stock status
   const productStock = stock !== undefined ? stock : productData?.stock;
-  const isLowStock = productStock !== undefined && productStock < 5 && productStock > 0;
-  const isOutOfStock = productStock !== undefined && productStock === 0;
+  const hasStockData = productStock !== undefined && productStock !== null && productStock !== '';
+  const numericStock = hasStockData ? Number(productStock) || 0 : null;
+  const isLowStock = hasStockData && numericStock > 0 && numericStock <= 10;
+  const isOutOfStock = hasStockData && numericStock === 0;
+  const lowStockLabel = numericStock === 1 ? '1 ITEM LEFT' : `ONLY ${numericStock} LEFT`;
   
   // Calculate if product is new (created within 7 days)
   const isNew = createdAt && (new Date() - new Date(createdAt)) < 7 * 24 * 60 * 60 * 1000;
@@ -88,8 +91,8 @@ const ProductTile = ({ id, image, name, price, colors = [], product, stock }) =>
             {discountPercentage > 0 && (
               <span className="badge badge-sale">{discountPercentage}% OFF</span>
             )}
-            {isOutOfStock && <span className="badge badge-out">OUT OF STOCK</span>}
-            {isLowStock && <span className="badge badge-low">ONLY {productStock} LEFT</span>}
+            {isOutOfStock && <span className="badge badge-stock badge-out">OUT OF STOCK</span>}
+            {isLowStock && <span className="badge badge-stock badge-low">{lowStockLabel}</span>}
           </div>
           
           <img src={image} alt={name} className="product-image" />

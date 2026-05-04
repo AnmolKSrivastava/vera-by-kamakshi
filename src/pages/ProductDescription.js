@@ -48,8 +48,8 @@ const ProductDescription = () => {
   }, [id]);
 
   // Calculate stock status early for use in SEO metadata
-  const stock = product?.stock || 12;
-  const isLowStock = stock < 5 && stock > 0;
+  const stock = Number(product?.stock) || 0;
+  const isLowStock = stock > 0 && stock <= 10;
   const isOutOfStock = stock === 0;
 
   // Memoize product images array to prevent unnecessary re-renders
@@ -160,7 +160,8 @@ const ProductDescription = () => {
         name: product.name,
         image: product.image,
         price: product.price,
-        category: product.category
+        category: product.category,
+        stock: product.stock
       });
     }
     
@@ -237,11 +238,11 @@ const ProductDescription = () => {
           <div className="product-indicators">
             {!isOutOfStock && (
               <span className={`stock-indicator ${isLowStock ? 'low' : 'available'}`}>
-                {isLowStock ? `🟡 Only ${stock} left!` : '🟢 In Stock'}
+                {isLowStock ? `${stock === 1 ? 'Only 1 piece left' : `Only ${stock} pieces left`}` : 'Available for dispatch'}
               </span>
             )}
             {isOutOfStock && (
-              <span className="stock-indicator out">🔴 Out of Stock</span>
+              <span className="stock-indicator out">Currently unavailable</span>
             )}
             <span className="viewing-count">⚡ {viewingCount} people viewing</span>
           </div>

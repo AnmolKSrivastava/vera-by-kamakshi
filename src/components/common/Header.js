@@ -176,6 +176,20 @@ function Header({ onLoginClick }) {
                       </div>
                       <div className="header-dropdown-divider"></div>
                       <Link 
+                        to="/profile" 
+                        className="header-dropdown-item"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        My Profile
+                      </Link>
+                      <Link 
+                        to="/orders" 
+                        className="header-dropdown-item"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        My Orders
+                      </Link>
+                      <Link 
                         to="/wishlist" 
                         className="header-dropdown-item"
                         onClick={() => setDropdownOpen(false)}
@@ -238,6 +252,16 @@ function Header({ onLoginClick }) {
           <Link to="/contact" className="header-mobile-link" onClick={() => setMenuOpen(false)}>
             Contact
           </Link>
+          {user && (
+            <>
+              <Link to="/profile" className="header-mobile-link" onClick={() => setMenuOpen(false)}>
+                My Profile
+              </Link>
+              <Link to="/orders" className="header-mobile-link" onClick={() => setMenuOpen(false)}>
+                My Orders
+              </Link>
+            </>
+          )}
           <Link to="/wishlist" className="header-mobile-link" onClick={() => setMenuOpen(false)}>
             Wishlist
           </Link>

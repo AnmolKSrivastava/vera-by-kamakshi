@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { getAllOrders, updateOrder } from '../../../services/orderService';
+import { getAllOrders, updateOrder, updateOrderStatus } from '../../../services/orderService';
+import { useAuth } from '../../../context/AuthContext';
 import './AdminOrdersManagement.css';
 
 const AdminOrdersManagement = ({ onLog }) => {
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -48,35 +50,37 @@ const AdminOrdersManagement = ({ onLog }) => {
     if (!selectedOrder || !newStatus) return;
 
     try {
-      const updateData = { status: newStatus };
-      if (trackingNumber) {
-        updateData.trackingNumber = trackingNumber;
+      // Use updateOrderStatus for status changes (handles stock restoration for cancellations)
+      await updateOrderStatus(selectedOrder.id, newStatus, user?.email || 'Admin');
+      
+      // Update tracking number separately if provided
+      if (trackingNumber && trackingNumber !== selectedOrder.trackingNumber) {
+        await updateOrder(selectedOrder.id, { trackingNumber });
       }
       
-      await updateOrder(selectedOrder.id, updateData);
-      
-      // Update local state
-      setOrders(prev => 
-        prev.map(order => 
-          order.id === selectedOrder.id 
-            ? { ...order, ...updateData } 
-            : order
-        )
-      );
+      // Refresh orders to get updated data
+      await fetchOrders();
 
       // Log activity
       if (onLog) {
-        onLog('Order Status Updated', `Order #${selectedOrder.id.slice(0, 8)} status changed to ${newStatus}`);
+        const statusMessage = newStatus === 'cancelled' 
+          ? `Order #${selectedOrder.id.slice(0, 8)} cancelled (stock restored)` 
+          : `Order #${selectedOrder.id.slice(0, 8)} status changed to ${newStatus}`;
+        onLog('Order Status Updated', statusMessage);
       }
 
       setShowStatusModal(false);
       setSelectedOrder(null);
       setNewStatus('');
       setTrackingNumber('');
-      alert('Order status updated successfully');
+      
+      const message = newStatus === 'cancelled'
+        ? 'Order cancelled successfully. Stock has been restored.'
+        : 'Order status updated successfully';
+      alert(message);
     } catch (error) {
       console.error('Error updating order status:', error);
-      alert('Failed to update order status');
+      alert('Failed to update order status: ' + (error.message || 'Unknown error'));
     }
   };
 
