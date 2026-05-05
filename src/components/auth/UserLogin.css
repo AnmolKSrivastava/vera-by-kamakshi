@@ -365,6 +365,54 @@
   color: #666;
 }
 
+/* Profile Error Overlay */
+.profile-error-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-error-message {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.profile-error-message p {
+  margin: 0 0 1.5rem 0;
+  color: #e74c3c;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.profile-error-message button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-error-message button:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .user-login-modal {

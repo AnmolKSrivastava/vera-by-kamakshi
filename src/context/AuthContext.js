@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [profileComplete, setProfileComplete] = useState(false);
 
   useEffect(() => {
     // Subscribe to auth state changes
@@ -38,14 +39,30 @@ export const AuthProvider = ({ children }) => {
         // Check admin status
         try {
           const adminEmails = await fetchAdminEmails();
-          console.log('[AuthContext] Checking admin:', currentUser.email, adminEmails);
           setIsAdmin(adminEmails.includes(currentUser.email));
         } catch (err) {
           console.error('Error checking admin status:', err);
           setIsAdmin(false);
         }
+
+        // Check if user profile is complete in Firestore
+        try {
+          const profile = await authService.getUserProfile(currentUser.uid);
+          if (profile.exists) {
+            // Check if profile has all required fields
+            const data = profile.data;
+            const hasAllFields = data.fullName && data.email && data.phoneNumber;
+            setProfileComplete(hasAllFields);
+          } else {
+            setProfileComplete(false);
+          }
+        } catch (err) {
+          console.error('Error checking profile completion:', err);
+          setProfileComplete(false);
+        }
       } else {
         setIsAdmin(false);
+        setProfileComplete(false);
       }
       
       setLoading(false);
@@ -115,6 +132,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     isAdmin,
+    profileComplete,
     loading,
     error,
     signInWithGoogle,

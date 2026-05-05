@@ -18,7 +18,6 @@ export const storageService = {
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
       
-      console.log('File uploaded successfully:', downloadURL);
       return downloadURL;
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -61,8 +60,6 @@ export const storageService = {
       
       const fileRef = ref(storage, filePath);
       await deleteObject(fileRef);
-      
-      console.log('File deleted successfully:', filePath);
     } catch (error) {
       console.error('Error deleting file:', error);
       throw error;

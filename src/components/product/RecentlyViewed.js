@@ -38,7 +38,7 @@ const RecentlyViewed = ({ currentProductId = null, limit = 8 }) => {
     <div className="recently-viewed">
       <div className="recently-viewed-header">
         <h3 className="recently-viewed-title">Recently Viewed</h3>
-        <span className="recently-viewed-count">{recentProducts.length} item{recentProducts.length !== 1 ? 's' : ''}</span>
+        <p className="recently-viewed-subtitle">Continue where you left off</p>
       </div>
       <div className="recently-viewed-grid">
         {recentProducts.map(product => (

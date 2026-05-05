@@ -21,7 +21,6 @@ const ContactUs = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // In production, this would send to a backend API or Firebase
-    console.log('Contact form submitted:', formData);
     setSubmitted(true);
     
     // Reset form after 3 seconds

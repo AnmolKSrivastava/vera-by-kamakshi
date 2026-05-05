@@ -3,14 +3,14 @@ import { useLocation } from 'react-router-dom';
 
 const SITE_NAME = 'VERA by Kamakshi';
 const SITE_URL = process.env.REACT_APP_SITE_URL || 'https://vera-by-kamakshi.web.app';
-const DEFAULT_DESCRIPTION = 'Discover handcrafted luxury handbags, clutches, totes, and wallets from VERA by Kamakshi.';
+const DEFAULT_DESCRIPTION = 'Discover exquisite handcrafted luxury handbags, clutches, totes, and wallets. Premium quality with timeless elegance and exceptional craftsmanship. Free shipping across India.';
 const DEFAULT_IMAGE = `${SITE_URL}/logo512.png`;
 
 const ROUTE_META = {
   '/': {
-    title: 'Luxury Handbags and Accessories',
-    description: 'Discover handcrafted luxury handbags, clutches, totes, and wallets designed with timeless elegance.',
-    keywords: 'luxury bags, handbags, clutches, wallets, handcrafted accessories, VERA by Kamakshi'
+    title: 'Luxury Handcrafted Bags & Accessories',
+    description: 'Discover exquisite handcrafted luxury handbags, clutches, totes, and wallets. Premium quality with timeless elegance and exceptional craftsmanship. Free shipping across India.',
+    keywords: 'luxury handbags, handcrafted bags, designer bags, clutches, totes, wallets, premium accessories, VERA by Kamakshi, luxury fashion, Indian designer bags'
   },
   '/collections': {
     title: 'Shop Collections',

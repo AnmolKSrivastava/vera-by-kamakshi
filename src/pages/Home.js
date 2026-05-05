@@ -203,7 +203,7 @@ function Home() {
         ref={recentlyViewedRef}
         className={`scroll-reveal ${recentlyViewedVisible ? 'is-visible' : ''}`}
       >
-        <RecentlyViewed limit={4} />
+        <RecentlyViewed limit={5} />
       </div>
       
       <Newsletter />

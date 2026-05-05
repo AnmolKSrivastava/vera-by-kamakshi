@@ -1,6 +1,7 @@
 {
   "short_name": "VERA",
-  "name": "VERA by Kamakshi",
+  "name": "VERA by Kamakshi - Luxury Handcrafted Bags",
+  "description": "Discover exquisite handcrafted luxury handbags, clutches, totes, and wallets. Premium quality with timeless elegance and exceptional craftsmanship.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,16 +11,21 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#030213",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "lifestyle", "fashion"],
+  "lang": "en-IN"
 }

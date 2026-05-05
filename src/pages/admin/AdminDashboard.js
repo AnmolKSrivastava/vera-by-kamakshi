@@ -1919,24 +1919,20 @@ const AdminDashboard = () => {
                 <table className="users-table">
                   <thead>
                     <tr>
-                      <th>Email</th>
                       <th>Name</th>
+                      <th>Contact Number</th>
+                      <th>Email</th>
                       <th>Joined</th>
-                      <th>Role</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((user) => (
                       <tr key={user.id}>
+                        <td>{user.fullName || user.name || user.displayName || 'N/A'}</td>
+                        <td>{user.phoneNumber || 'N/A'}</td>
                         <td>{user.email}</td>
-                        <td>{user.name || 'N/A'}</td>
                         <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</td>
-                        <td>
-                          <span className={`role-badge ${user.role || 'user'}`}>
-                            {user.role || 'User'}
-                          </span>
-                        </td>
                         <td>
                           <button className="delete-btn" onClick={() => handleDeleteUserClick(user)}>🗑️ Delete</button>
                         </td>
@@ -2281,9 +2277,9 @@ const AdminDashboard = () => {
               {userToDelete && (
                 <div className="product-delete-info">
                   <div className="delete-product-details">
+                    <p><strong>Name:</strong> {userToDelete.fullName || userToDelete.name || userToDelete.displayName || 'N/A'}</p>
+                    <p><strong>Contact Number:</strong> {userToDelete.phoneNumber || 'N/A'}</p>
                     <p><strong>Email:</strong> {userToDelete.email}</p>
-                    <p><strong>Name:</strong> {userToDelete.name || 'N/A'}</p>
-                    <p><strong>Role:</strong> {userToDelete.role || 'User'}</p>
                   </div>
                 </div>
               )}

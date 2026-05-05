@@ -19,7 +19,6 @@ export async function fetchAdminEmails() {
     
     // Extract emails from document IDs
     const adminEmails = querySnapshot.docs.map(doc => doc.id);
-    console.log('[AdminService] Loaded admin emails:', adminEmails.length, 'admin(s)');
     
     return adminEmails;
   } catch (error) {

@@ -3,6 +3,7 @@ import './UserLogin.css';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
 import { isAdmin } from '../../services/adminService';
+import UserProfileModal from './UserProfileModal';
 
 const UserLogin = ({ isOpen, onClose }) => {
   const { user } = useAuth();
@@ -15,6 +16,12 @@ const UserLogin = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  
+  // Profile modal states
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [pendingUser, setPendingUser] = useState(null);
+  const [pendingLoginMethod, setPendingLoginMethod] = useState('');
+  const [profileError, setProfileError] = useState('');
 
   // Close modal if user logs in
   useEffect(() => {
@@ -100,12 +107,23 @@ const UserLogin = ({ isOpen, onClose }) => {
 
     setLoading(true);
     try {
-      await authService.verifyOTP(confirmationResult, otp);
-      setMessage('Sign in successful!');
-      setTimeout(() => {
-        onClose();
-        resetForm();
-      }, 500);
+      const result = await authService.verifyOTP(confirmationResult, otp);
+      
+      // Check if this is a new user
+      if (result.isNewUser) {
+        // Show profile completion modal
+        setPendingUser(result.user);
+        setPendingLoginMethod('phone');
+        setShowProfileModal(true);
+        setLoading(false);
+      } else {
+        // Existing user - sign in complete
+        setMessage('Sign in successful!');
+        setTimeout(() => {
+          onClose();
+          resetForm();
+        }, 500);
+      }
     } catch (err) {
       console.error('Error verifying OTP:', err);
       let errorMessage = 'Invalid OTP. Please try again.';
@@ -117,8 +135,8 @@ const UserLogin = ({ isOpen, onClose }) => {
       }
       
       setError(errorMessage);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Google Sign-In
@@ -141,13 +159,25 @@ const UserLogin = ({ isOpen, onClose }) => {
         if (result?.user) await authService.signOut();
         return;
       }
+      
       // Proceed with normal sign-in
-      await authService.signInWithGoogle();
-      setMessage('Sign in successful!');
-      setTimeout(() => {
-        onClose();
-        resetForm();
-      }, 500);
+      const signInResult = await authService.signInWithGoogle();
+      
+      // Check if this is a new user
+      if (signInResult.isNewUser) {
+        // Show profile completion modal
+        setPendingUser(signInResult.user);
+        setPendingLoginMethod('google');
+        setShowProfileModal(true);
+        setLoading(false);
+      } else {
+        // Existing user - sign in complete
+        setMessage('Sign in successful!');
+        setTimeout(() => {
+          onClose();
+          resetForm();
+        }, 500);
+      }
     } catch (err) {
       console.error('Google sign-in error:', err);
       let errorMessage = 'Failed to sign in with Google';
@@ -168,6 +198,50 @@ const UserLogin = ({ isOpen, onClose }) => {
     // removed setCheckingAdmin
   };
 
+  // Handle profile completion submission
+  const handleProfileSubmit = async (profileData) => {
+    setProfileError('');
+    
+    try {
+      if (!pendingUser) {
+        throw new Error('No pending user found');
+      }
+
+      // Create complete user profile with all required fields
+      await authService.createCompleteUserProfile({
+        uid: pendingUser.uid,
+        fullName: profileData.fullName,
+        email: profileData.email,
+        phoneNumber: profileData.phoneNumber,
+        loginMethod: pendingLoginMethod,
+        photoURL: pendingUser.photoURL || null
+      });
+
+      // Profile created successfully
+      setShowProfileModal(false);
+      setMessage('Account created successfully! Welcome to VERA.');
+      
+      setTimeout(() => {
+        onClose();
+        resetForm();
+      }, 1000);
+    } catch (err) {
+      console.error('Error creating profile:', err);
+      
+      let errorMessage = 'Failed to create profile. Please try again.';
+      if (err.message.includes('email address is already registered')) {
+        errorMessage = 'This email address is already registered with another account';
+      } else if (err.message.includes('phone number is already registered')) {
+        errorMessage = 'This phone number is already registered with another account';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setProfileError(errorMessage);
+      throw err; // Re-throw to let modal handle it
+    }
+  };
+
   const resetForm = () => {
     setPhoneNumber('');
     setOtp('');
@@ -176,6 +250,10 @@ const UserLogin = ({ isOpen, onClose }) => {
     setError('');
     setMessage('');
     setLoginMethod('google'); // Reset to Google since it's the working method
+    setShowProfileModal(false);
+    setPendingUser(null);
+    setPendingLoginMethod('');
+    setProfileError('');
     authService.cleanupRecaptcha();
   };
 
@@ -195,6 +273,30 @@ const UserLogin = ({ isOpen, onClose }) => {
 
   return (
     <>
+      {/* Profile Completion Modal */}
+      {showProfileModal && pendingUser && (
+        <UserProfileModal
+          isOpen={showProfileModal}
+          onClose={() => {}} // Cannot close until profile is completed
+          onSubmit={handleProfileSubmit}
+          initialData={{
+            email: pendingUser.email || '',
+            phoneNumber: pendingUser.phoneNumber || '',
+            fullName: pendingUser.displayName || ''
+          }}
+          loading={loading}
+        />
+      )}
+
+      {profileError && showProfileModal && (
+        <div className="profile-error-overlay">
+          <div className="profile-error-message">
+            <p>{profileError}</p>
+            <button onClick={() => setProfileError('')}>Close</button>
+          </div>
+        </div>
+      )}
+
       <div className="user-login-backdrop" onClick={handleClose}></div>
       <div className="user-login-modal">
         <button className="close-btn" onClick={handleClose}>×</button>

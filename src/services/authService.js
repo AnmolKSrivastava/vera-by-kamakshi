@@ -5,14 +5,10 @@ import {
   RecaptchaVerifier,
   signOut as firebaseSignOut 
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../config/firebase';
 
 export const authService = {
-  /**
-   * Sign in with Google OAuth
-   * @returns {Promise<Object>} User object
-   */
   /**
    * Sign in with Google OAuth
    * @param {Object} [options] - Optional config
@@ -23,12 +19,25 @@ export const authService = {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
+      
+      // If onlyGetUser is true, just return user without profile creation
       if (options.onlyGetUser) {
         return { user };
       }
-      // Create or update user profile
-      await this.createUserProfile(user, 'google');
-      return user;
+      
+      // Check if user profile exists
+      const profile = await this.getUserProfile(user.uid);
+      
+      // If profile doesn't exist, return user without creating profile
+      // Profile will be created after user completes the profile modal
+      if (!profile.exists) {
+        return { user, isNewUser: true };
+      }
+      
+      // For existing users, update last login info
+      await this.updateUserLastLogin(user.uid);
+      
+      return { user, isNewUser: false };
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error;
@@ -48,7 +57,7 @@ export const authService = {
         window.recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerId, {
           size: 'normal',
           callback: (response) => {
-            console.log('reCAPTCHA verified successfully', response);
+            // reCAPTCHA verified
           },
           'expired-callback': () => {
             console.error('reCAPTCHA expired');
@@ -63,7 +72,6 @@ export const authService = {
         // Render the reCAPTCHA widget
         try {
           await window.recaptchaVerifier.render();
-          console.log('reCAPTCHA widget rendered successfully');
         } catch (renderError) {
           console.error('Error rendering reCAPTCHA:', renderError);
           throw new Error('Failed to load reCAPTCHA. Please refresh the page.');
@@ -92,17 +100,26 @@ export const authService = {
    * Verify OTP and complete phone authentication
    * @param {Object} confirmationResult - Result from signInWithPhone
    * @param {string} otp - OTP code entered by user
-   * @returns {Promise<Object>} User object
+   * @returns {Promise<Object>} User object and profile status
    */
   async verifyOTP(confirmationResult, otp) {
     try {
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
       
-      // Create or update user profile
-      await this.createUserProfile(user, 'phone');
+      // Check if user profile exists
+      const profile = await this.getUserProfile(user.uid);
       
-      return user;
+      // If profile doesn't exist, return user without creating profile
+      // Profile will be created after user completes the profile modal
+      if (!profile.exists) {
+        return { user, isNewUser: true };
+      }
+      
+      // For existing users, update last login info
+      await this.updateUserLastLogin(user.uid);
+      
+      return { user, isNewUser: false };
     } catch (error) {
       console.error('Error verifying OTP:', error);
       throw error;
@@ -132,7 +149,6 @@ export const authService = {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         });
-        console.log('User profile created successfully');
       } else {
         // Update existing user profile
         await setDoc(userRef, {
@@ -143,7 +159,6 @@ export const authService = {
           loginMethod: loginMethod,
           updatedAt: new Date().toISOString()
         }, { merge: true });
-        console.log('User profile updated successfully');
       }
     } catch (error) {
       console.error('Error creating/updating user profile:', error);
@@ -158,7 +173,6 @@ export const authService = {
   async signOut() {
     try {
       await firebaseSignOut(auth);
-      console.log('User signed out successfully');
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
@@ -173,9 +187,141 @@ export const authService = {
       try {
         window.recaptchaVerifier.clear();
       } catch (err) {
-        console.log('reCAPTCHA cleanup:', err);
+        // Cleanup error ignored
       }
       window.recaptchaVerifier = null;
+    }
+  },
+
+  /**
+   * Check if a user exists by email or phone number
+   * @param {string} email - User's email address
+   * @param {string} phoneNumber - User's phone number
+   * @returns {Promise<Object|null>} Existing user data or null if not found
+   */
+  async checkExistingUser(email, phoneNumber) {
+    try {
+      const usersRef = collection(db, 'users');
+      
+      // Check by email if provided
+      if (email) {
+        const emailQuery = query(usersRef, where('email', '==', email));
+        const emailSnapshot = await getDocs(emailQuery);
+        
+        if (!emailSnapshot.empty) {
+          const userData = emailSnapshot.docs[0].data();
+          return { exists: true, user: userData, uid: emailSnapshot.docs[0].id };
+        }
+      }
+      
+      // Check by phone number if provided
+      if (phoneNumber) {
+        const phoneQuery = query(usersRef, where('phoneNumber', '==', phoneNumber));
+        const phoneSnapshot = await getDocs(phoneQuery);
+        
+        if (!phoneSnapshot.empty) {
+          const userData = phoneSnapshot.docs[0].data();
+          return { exists: true, user: userData, uid: phoneSnapshot.docs[0].id };
+        }
+      }
+      
+      return { exists: false, user: null, uid: null };
+    } catch (error) {
+      console.error('Error checking existing user:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get user profile from Firestore
+   * @param {string} uid - User's Firebase UID
+   * @returns {Promise<Object|null>} User profile data or null if not found
+   */
+  async getUserProfile(uid) {
+    try {
+      const userRef = doc(db, 'users', uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        return { exists: true, data: userSnap.data() };
+      }
+      
+      return { exists: false, data: null };
+    } catch (error) {
+      console.error('Error getting user profile:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update user's last login timestamp
+   * @param {string} uid - User's Firebase UID
+   * @returns {Promise<void>}
+   */
+  async updateUserLastLogin(uid) {
+    try {
+      const userRef = doc(db, 'users', uid);
+      await setDoc(userRef, {
+        lastLoginAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (error) {
+      console.error('Error updating last login:', error);
+      // Don't throw error, just log it
+    }
+  },
+
+  /**
+   * Create complete user profile with all required fields
+   * @param {Object} userData - Complete user data
+   * @param {string} userData.uid - Firebase user UID
+   * @param {string} userData.fullName - User's full name
+   * @param {string} userData.email - User's email address
+   * @param {string} userData.phoneNumber - User's phone number
+   * @param {string} userData.loginMethod - 'google' or 'phone'
+   * @param {string} [userData.photoURL] - User's profile photo URL
+   * @returns {Promise<void>}
+   */
+  async createCompleteUserProfile(userData) {
+    try {
+      const { uid, fullName, email, phoneNumber, loginMethod, photoURL } = userData;
+
+      // Validate required fields
+      if (!uid || !fullName || !email || !phoneNumber) {
+        throw new Error('Missing required fields: uid, fullName, email, and phoneNumber are mandatory');
+      }
+
+      // Check for duplicate email or phone
+      const existingUser = await this.checkExistingUser(email, phoneNumber);
+      
+      if (existingUser.exists && existingUser.uid !== uid) {
+        // Another user already has this email or phone
+        if (existingUser.user.email === email) {
+          throw new Error('This email address is already registered with another account');
+        }
+        if (existingUser.user.phoneNumber === phoneNumber) {
+          throw new Error('This phone number is already registered with another account');
+        }
+      }
+
+      // Create user profile in Firestore
+      const userRef = doc(db, 'users', uid);
+      await setDoc(userRef, {
+        uid: uid,
+        fullName: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        phoneNumber: phoneNumber.trim(),
+        displayName: fullName.trim(),
+        photoURL: photoURL || null,
+        loginMethod: loginMethod,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error creating complete user profile:', error);
+      throw error;
     }
   }
 };
