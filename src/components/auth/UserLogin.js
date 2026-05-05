@@ -23,12 +23,12 @@ const UserLogin = ({ isOpen, onClose }) => {
   const [pendingLoginMethod, setPendingLoginMethod] = useState('');
   const [profileError, setProfileError] = useState('');
 
-  // Close modal if user logs in
+  // Close modal if user logs in (but not if profile completion is needed)
   useEffect(() => {
-    if (user) {
+    if (user && !showProfileModal) {
       onClose();
     }
-  }, [user, onClose]);
+  }, [user, showProfileModal, onClose]);
 
   // Cleanup reCAPTCHA on unmount
   useEffect(() => {
