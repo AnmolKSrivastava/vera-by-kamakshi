@@ -47,16 +47,27 @@ export const authService = {
       if (!window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerId, {
           size: 'normal',
-          callback: () => {
-            console.log('reCAPTCHA verified successfully');
+          callback: (response) => {
+            console.log('reCAPTCHA verified successfully', response);
           },
           'expired-callback': () => {
+            console.error('reCAPTCHA expired');
             throw new Error('reCAPTCHA expired. Please try again.');
           },
-          'error-callback': () => {
+          'error-callback': (error) => {
+            console.error('reCAPTCHA error:', error);
             throw new Error('reCAPTCHA error. Please refresh and try again.');
           }
         });
+
+        // Render the reCAPTCHA widget
+        try {
+          await window.recaptchaVerifier.render();
+          console.log('reCAPTCHA widget rendered successfully');
+        } catch (renderError) {
+          console.error('Error rendering reCAPTCHA:', renderError);
+          throw new Error('Failed to load reCAPTCHA. Please refresh the page.');
+        }
       }
 
       const confirmationResult = await signInWithPhoneNumber(

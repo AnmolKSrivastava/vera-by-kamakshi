@@ -29,22 +29,16 @@ function Wishlist() {
 
   if (wishlistItems.length === 0) {
     return (
-      <div className="wishlist-page">
-        <div className="wishlist-container">
-          <div className="wishlist-header">
-            <h1>My Wishlist</h1>
-            <p className="wishlist-count">0 items</p>
-          </div>
-          <div className="wishlist-empty">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ef5350" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-            </svg>
-            <h2>Your Wishlist is Empty</h2>
-            <p>Save items you love for later!</p>
-            <Link to="/collections" className="continue-shopping-btn">
-              Browse Products
-            </Link>
-          </div>
+      <div className="wishlist-empty">
+        <div className="wishlist-empty-content">
+          <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          <h2>Your wishlist is empty</h2>
+          <p>Add some products to get started</p>
+          <Link to="/collections" className="continue-shopping-btn">
+            Continue Shopping
+          </Link>
         </div>
       </div>
     );

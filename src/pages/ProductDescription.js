@@ -41,6 +41,11 @@ const ProductDescription = () => {
 
   // Reset selections when product changes
   useEffect(() => {
+    // Scroll to top when product changes
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
     setSelectedColor(null);
     setSelectedSize(null);
     setQuantity(1);

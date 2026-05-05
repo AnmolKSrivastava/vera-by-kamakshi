@@ -67,12 +67,16 @@ const UserLogin = ({ isOpen, onClose }) => {
       let errorMessage = 'Failed to send OTP. Please try again.';
       if (err.message === 'TIMEOUT') {
         errorMessage = 'Phone authentication is not properly configured in Firebase. Please use Google sign-in instead or contact support.';
+      } else if (err.code === 'auth/invalid-app-credential') {
+        errorMessage = 'reCAPTCHA verification failed. Please refresh the page and try again. If the issue persists, contact support.';
       } else if (err.code === 'auth/billing-not-enabled') {
         errorMessage = 'Phone authentication requires billing. Please use Google sign-in or contact support.';
       } else if (err.code === 'auth/invalid-phone-number') {
         errorMessage = 'Invalid phone number format. Use +91XXXXXXXXXX';
       } else if (err.code === 'auth/too-many-requests') {
         errorMessage = 'Too many attempts. Please try again later.';
+      } else if (err.message && err.message.includes('reCAPTCHA')) {
+        errorMessage = 'reCAPTCHA error. Please refresh the page and try again.';
       } else if (err.message) {
         errorMessage = err.message;
       }
@@ -227,13 +231,6 @@ const UserLogin = ({ isOpen, onClose }) => {
         {/* Phone OTP Login */}
         {loginMethod === 'phone' && (
           <div className="phone-login-section">
-            <div className="info-box warning-box">
-              <strong>⚠️ Phone Authentication Not Configured</strong>
-              <br />
-              Please use <strong>Google sign-in</strong> for now.
-              <br />
-              <small>Phone OTP requires Firebase billing setup</small>
-            </div>
             {step === 1 ? (
               <form onSubmit={handleSendOTP}>
                 <div className="form-group">
