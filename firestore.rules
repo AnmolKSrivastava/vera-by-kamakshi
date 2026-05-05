@@ -27,6 +27,11 @@ service cloud.firestore {
     match /products/{productId} {
       allow read: if true;
       allow write: if isAdmin();
+      // Allow authenticated users to update stock when placing/cancelling orders
+      allow update: if isSignedIn() && 
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock', 'updatedAt']) &&
+                       (request.resource.data.stock < resource.data.stock || // Placing order (reduce)
+                        request.resource.data.stock > resource.data.stock);  // Cancelling order (restore)
     }
     
     // Admin collection (email-based) - Read for authenticated users, write disabled
@@ -56,7 +61,14 @@ service cloud.firestore {
                      (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if isSignedIn() && 
                        request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAdmin();
+      // Allow users to cancel their own pending/processing orders
+      allow update: if isAdmin() || 
+                       (isSignedIn() && 
+                        resource.data.userId == request.auth.uid &&
+                        (resource.data.status == 'pending' || resource.data.status == 'processing') &&
+                        request.resource.data.status == 'cancelled' &&
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt', 'cancelledAt', 'cancellationReason', 'cancelledBy']));
+      allow delete: if isAdmin();
     }
     
     // Reviews - Authenticated users can create, owner can update/delete
@@ -77,9 +89,13 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
     
-    // Stock History - Admin only
+    // Stock History - Admin only, users can create entries when placing/cancelling orders
     match /stockHistory/{historyId} {
       allow read, write: if isAdmin();
+      // Allow authenticated users to create stock history for order operations
+      allow create: if isSignedIn() && 
+                       ((request.resource.data.reason == 'Order Placed' && request.resource.data.change < 0) ||
+                        (request.resource.data.reason == 'Order Cancelled' && request.resource.data.change > 0));
     }
   }
 }

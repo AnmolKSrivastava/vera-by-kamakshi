@@ -27,7 +27,7 @@ const UserProfile = () => {
   const [editingAddressIndex, setEditingAddressIndex] = useState(null);
   const [addressForm, setAddressForm] = useState({
     name: '',
-    phone: '',
+    phone: '+91',
     addressLine1: '',
     addressLine2: '',
     city: '',
@@ -92,10 +92,28 @@ const UserProfile = () => {
 
   const handleAddressChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setAddressForm({
-      ...addressForm,
-      [name]: type === 'checkbox' ? checked : value
-    });
+    
+    // Special handling for phone number
+    if (name === 'phone') {
+      let phoneValue = value;
+      // Ensure +91 prefix is always present
+      if (!phoneValue.startsWith('+91')) {
+        phoneValue = '+91';
+      }
+      // Only allow digits after +91, limit to 10 digits
+      const digitsOnly = phoneValue.slice(3).replace(/\D/g, '');
+      phoneValue = '+91' + digitsOnly.slice(0, 10);
+      
+      setAddressForm({
+        ...addressForm,
+        [name]: phoneValue
+      });
+    } else {
+      setAddressForm({
+        ...addressForm,
+        [name]: type === 'checkbox' ? checked : value
+      });
+    }
   };
 
   const handleSaveAddress = async () => {
@@ -190,7 +208,7 @@ const UserProfile = () => {
   const resetAddressForm = () => {
     setAddressForm({
       name: '',
-      phone: '',
+      phone: '+91',
       addressLine1: '',
       addressLine2: '',
       city: '',
@@ -350,8 +368,9 @@ const UserProfile = () => {
                           name="phone"
                           value={addressForm.phone}
                           onChange={handleAddressChange}
-                          placeholder="Enter phone number"
+                          placeholder="+91 XXXXXXXXXX"
                         />
+                        <small className="input-hint">Enter your 10-digit mobile number</small>
                       </div>
                     </div>
 

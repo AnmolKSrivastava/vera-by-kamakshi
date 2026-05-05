@@ -209,6 +209,14 @@
   background: #fafafa;
 }
 
+.header-dropdown-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0 0 0.25rem 0;
+  word-break: break-word;
+}
+
 .header-dropdown-email {
   font-size: 0.85rem;
   color: #666;

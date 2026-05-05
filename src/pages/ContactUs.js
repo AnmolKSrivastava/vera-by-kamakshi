@@ -5,17 +5,36 @@ const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
+    phone: '+91',
     subject: '',
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    
+    // Special handling for phone number
+    if (name === 'phone') {
+      let phoneValue = value;
+      // Ensure +91 prefix is always present
+      if (!phoneValue.startsWith('+91')) {
+        phoneValue = '+91';
+      }
+      // Only allow digits after +91, limit to 10 digits
+      const digitsOnly = phoneValue.slice(3).replace(/\D/g, '');
+      phoneValue = '+91' + digitsOnly.slice(0, 10);
+      
+      setFormData({
+        ...formData,
+        [name]: phoneValue
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -28,7 +47,7 @@ const ContactUs = () => {
       setFormData({
         name: '',
         email: '',
-        phone: '',
+        phone: '+91',
         subject: '',
         message: ''
       });
@@ -92,8 +111,9 @@ const ContactUs = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="+91 XXXXX XXXXX"
+                      placeholder="+91 XXXXXXXXXX"
                     />
+                    <small className="input-hint">Enter your 10-digit mobile number</small>
                   </div>
                 </div>
 

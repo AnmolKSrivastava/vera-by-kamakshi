@@ -25,6 +25,7 @@ export const useAuth = () => {
  */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,18 +50,24 @@ export const AuthProvider = ({ children }) => {
         try {
           const profile = await authService.getUserProfile(currentUser.uid);
           if (profile.exists) {
+            // Store profile data
+            setUserProfile(profile.data);
+            
             // Check if profile has all required fields
             const data = profile.data;
             const hasAllFields = data.fullName && data.email && data.phoneNumber;
             setProfileComplete(hasAllFields);
           } else {
+            setUserProfile(null);
             setProfileComplete(false);
           }
         } catch (err) {
           console.error('Error checking profile completion:', err);
+          setUserProfile(null);
           setProfileComplete(false);
         }
       } else {
+        setUserProfile(null);
         setIsAdmin(false);
         setProfileComplete(false);
       }
@@ -131,6 +138,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    userProfile,
     isAdmin,
     profileComplete,
     loading,

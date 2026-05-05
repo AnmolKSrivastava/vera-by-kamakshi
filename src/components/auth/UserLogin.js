@@ -9,7 +9,7 @@ const UserLogin = ({ isOpen, onClose }) => {
   const { user } = useAuth();
   const [loginMethod, setLoginMethod] = useState('google'); // Default to 'google' since phone needs setup
   // Removed unused checkingAdmin state
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('+91');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState(1); // 1: enter phone, 2: enter OTP
   const [confirmationResult, setConfirmationResult] = useState(null);
@@ -22,13 +22,14 @@ const UserLogin = ({ isOpen, onClose }) => {
   const [pendingUser, setPendingUser] = useState(null);
   const [pendingLoginMethod, setPendingLoginMethod] = useState('');
   const [profileError, setProfileError] = useState('');
+  const [preventAutoClose, setPreventAutoClose] = useState(false);
 
   // Close modal if user logs in (but not if profile completion is needed)
   useEffect(() => {
-    if (user && !showProfileModal) {
+    if (user && !showProfileModal && !preventAutoClose) {
       onClose();
     }
-  }, [user, showProfileModal, onClose]);
+  }, [user, showProfileModal, preventAutoClose, onClose]);
 
   // Cleanup reCAPTCHA on unmount
   useEffect(() => {
@@ -106,18 +107,24 @@ const UserLogin = ({ isOpen, onClose }) => {
     }
 
     setLoading(true);
+    setPreventAutoClose(true); // Prevent modal from auto-closing
+    
     try {
       const result = await authService.verifyOTP(confirmationResult, otp);
+      console.log('[UserLogin] OTP verified, result:', result);
       
       // Check if this is a new user
       if (result.isNewUser) {
+        console.log('[UserLogin] New user detected, showing profile modal');
         // Show profile completion modal
         setPendingUser(result.user);
         setPendingLoginMethod('phone');
         setShowProfileModal(true);
         setLoading(false);
       } else {
+        console.log('[UserLogin] Existing user, login complete');
         // Existing user - sign in complete
+        setPreventAutoClose(false);
         setMessage('Sign in successful!');
         setTimeout(() => {
           onClose();
@@ -126,6 +133,7 @@ const UserLogin = ({ isOpen, onClose }) => {
       }
     } catch (err) {
       console.error('Error verifying OTP:', err);
+      setPreventAutoClose(false);
       let errorMessage = 'Invalid OTP. Please try again.';
       
       if (err.code === 'auth/invalid-verification-code') {
@@ -141,37 +149,40 @@ const UserLogin = ({ isOpen, onClose }) => {
 
   // Google Sign-In
   const handleGoogleSignIn = async () => {
-    setError('');
-    setMessage('');
     setLoading(true);
-    // removed setCheckingAdmin
+    setPreventAutoClose(true); // Prevent modal from auto-closing
+    
     try {
-      // Get email from Google popup before proceeding
-      const result = await authService.signInWithGoogle({ onlyGetUser: true });
-      const email = result?.user?.email;
+      // Sign in with Google once and check admin status
+      const signInResult = await authService.signInWithGoogle();
+      console.log('[UserLogin] Google sign-in result:', signInResult);
+      
+      const email = signInResult?.user?.email;
       if (!email) throw new Error('No email found from Google account.');
+      
+      // Check if user is admin
       const admin = await isAdmin(email);
       if (admin) {
+        // Admin detected - sign out and show error
+        await authService.signOut();
         setError('This email is registered as an admin and cannot be used for user login.');
         setLoading(false);
-        // removed setCheckingAdmin
-        // Optionally sign out the user if already signed in
-        if (result?.user) await authService.signOut();
+        setPreventAutoClose(false);
         return;
       }
       
-      // Proceed with normal sign-in
-      const signInResult = await authService.signInWithGoogle();
-      
       // Check if this is a new user
       if (signInResult.isNewUser) {
+        console.log('[UserLogin] New user detected, showing profile modal');
         // Show profile completion modal
         setPendingUser(signInResult.user);
         setPendingLoginMethod('google');
         setShowProfileModal(true);
         setLoading(false);
       } else {
+        console.log('[UserLogin] Existing user, login complete');
         // Existing user - sign in complete
+        setPreventAutoClose(false);
         setMessage('Sign in successful!');
         setTimeout(() => {
           onClose();
@@ -180,6 +191,7 @@ const UserLogin = ({ isOpen, onClose }) => {
       }
     } catch (err) {
       console.error('Google sign-in error:', err);
+      setPreventAutoClose(false);
       let errorMessage = 'Failed to sign in with Google';
       if (err.code === 'auth/popup-closed-by-user') {
         errorMessage = 'Sign-in cancelled. Please try again.';
@@ -195,11 +207,11 @@ const UserLogin = ({ isOpen, onClose }) => {
       setError(errorMessage);
     }
     setLoading(false);
-    // removed setCheckingAdmin
   };
 
   // Handle profile completion submission
   const handleProfileSubmit = async (profileData) => {
+    console.log('[UserLogin] Profile submission started:', profileData);
     setProfileError('');
     
     try {
@@ -207,6 +219,8 @@ const UserLogin = ({ isOpen, onClose }) => {
         throw new Error('No pending user found');
       }
 
+      console.log('[UserLogin] Creating user profile for UID:', pendingUser.uid);
+      
       // Create complete user profile with all required fields
       await authService.createCompleteUserProfile({
         uid: pendingUser.uid,
@@ -217,8 +231,11 @@ const UserLogin = ({ isOpen, onClose }) => {
         photoURL: pendingUser.photoURL || null
       });
 
+      console.log('[UserLogin] Profile created successfully');
+      
       // Profile created successfully
       setShowProfileModal(false);
+      setPreventAutoClose(false);
       setMessage('Account created successfully! Welcome to VERA.');
       
       setTimeout(() => {
@@ -226,14 +243,10 @@ const UserLogin = ({ isOpen, onClose }) => {
         resetForm();
       }, 1000);
     } catch (err) {
-      console.error('Error creating profile:', err);
+      console.error('[UserLogin] Error creating profile:', err);
       
       let errorMessage = 'Failed to create profile. Please try again.';
-      if (err.message.includes('email address is already registered')) {
-        errorMessage = 'This email address is already registered with another account';
-      } else if (err.message.includes('phone number is already registered')) {
-        errorMessage = 'This phone number is already registered with another account';
-      } else if (err.message) {
+      if (err.message) {
         errorMessage = err.message;
       }
       
@@ -243,7 +256,7 @@ const UserLogin = ({ isOpen, onClose }) => {
   };
 
   const resetForm = () => {
-    setPhoneNumber('');
+    setPhoneNumber('+91');
     setOtp('');
     setStep(1);
     setConfirmationResult(null);
@@ -253,6 +266,7 @@ const UserLogin = ({ isOpen, onClose }) => {
     setShowProfileModal(false);
     setPendingUser(null);
     setPendingLoginMethod('');
+    setPreventAutoClose(false);
     setProfileError('');
     authService.cleanupRecaptcha();
   };
@@ -341,11 +355,20 @@ const UserLogin = ({ isOpen, onClose }) => {
                     type="tel"
                     placeholder="+91XXXXXXXXXX"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={(e) => {
+                      let value = e.target.value;
+                      // Ensure +91 prefix is always present
+                      if (!value.startsWith('+91')) {
+                        value = '+91';
+                      }
+                      // Only allow digits after +91
+                      const digitsOnly = value.slice(3).replace(/\D/g, '');
+                      setPhoneNumber('+91' + digitsOnly.slice(0, 10));
+                    }}
                     required
                     className="phone-input"
                   />
-                  <small className="input-hint">Enter number with country code (+91)</small>
+                  <small className="input-hint">Enter your 10-digit mobile number</small>
                 </div>
                 <button 
                   type="submit" 

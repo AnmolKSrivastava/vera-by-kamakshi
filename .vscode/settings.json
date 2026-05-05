@@ -12,10 +12,16 @@
     "editor.tabSize": 2
   },
   "files.associations": {
-    "*.yml": "yaml"
+    "*.yml": "yaml",
+    ".github/workflows/*.yml": "yaml"
   },
   "github-actions.workflows.pinned.workflows": [
     ".github/workflows/firebase-deploy.yml",
     ".github/workflows/firebase-preview.yml"
-  ]
+  ],
+  "yaml.completion": true,
+  "yaml.hover": true,
+  "github-actions.disable-validation": true
 }
+
+

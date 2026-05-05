@@ -276,6 +276,13 @@
   cursor: pointer;
 }
 
+.input-hint {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: #888;
+}
+
 .form-actions {
   display: flex;
   gap: 1rem;

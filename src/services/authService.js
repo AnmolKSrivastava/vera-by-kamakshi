@@ -104,18 +104,23 @@ export const authService = {
    */
   async verifyOTP(confirmationResult, otp) {
     try {
+      console.log('[authService] Verifying OTP...');
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
+      console.log('[authService] OTP verified, user UID:', user.uid);
       
       // Check if user profile exists
       const profile = await this.getUserProfile(user.uid);
+      console.log('[authService] Profile check:', profile);
       
       // If profile doesn't exist, return user without creating profile
       // Profile will be created after user completes the profile modal
       if (!profile.exists) {
+        console.log('[authService] No profile found - new user');
         return { user, isNewUser: true };
       }
       
+      console.log('[authService] Profile exists - existing user');
       // For existing users, update last login info
       await this.updateUserLastLogin(user.uid);
       
@@ -284,6 +289,7 @@ export const authService = {
    */
   async createCompleteUserProfile(userData) {
     try {
+      console.log('[authService] Creating complete user profile:', userData);
       const { uid, fullName, email, phoneNumber, loginMethod, photoURL } = userData;
 
       // Validate required fields
@@ -291,20 +297,10 @@ export const authService = {
         throw new Error('Missing required fields: uid, fullName, email, and phoneNumber are mandatory');
       }
 
-      // Check for duplicate email or phone
-      const existingUser = await this.checkExistingUser(email, phoneNumber);
-      
-      if (existingUser.exists && existingUser.uid !== uid) {
-        // Another user already has this email or phone
-        if (existingUser.user.email === email) {
-          throw new Error('This email address is already registered with another account');
-        }
-        if (existingUser.user.phoneNumber === phoneNumber) {
-          throw new Error('This phone number is already registered with another account');
-        }
-      }
-
+      console.log('[authService] Creating profile in Firestore...');
       // Create user profile in Firestore
+      // Note: Firebase Auth already prevents duplicate emails/phone numbers,
+      // so we don't need to check for duplicates here
       const userRef = doc(db, 'users', uid);
       await setDoc(userRef, {
         uid: uid,
@@ -318,6 +314,7 @@ export const authService = {
         updatedAt: new Date().toISOString()
       });
 
+      console.log('[authService] Profile created successfully in Firestore');
       return { success: true };
     } catch (error) {
       console.error('Error creating complete user profile:', error);

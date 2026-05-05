@@ -13,7 +13,7 @@ function Header({ onLoginClick }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAdmin, signOut: authSignOut } = useAuth();
+  const { user, userProfile, isAdmin, signOut: authSignOut } = useAuth();
   const searchInputRef = React.useRef(null);
 
   const handleLogout = async () => {
@@ -164,7 +164,10 @@ function Header({ onLoginClick }) {
                       <img src={user.photoURL} alt="Profile" className="header-user-avatar" />
                     ) : (
                       <div className="header-user-avatar-placeholder">
-                        {user.email?.charAt(0).toUpperCase()}
+                        {userProfile?.fullName?.charAt(0).toUpperCase() || 
+                         userProfile?.displayName?.charAt(0).toUpperCase() || 
+                         user.email?.charAt(0).toUpperCase() || 
+                         user.phoneNumber?.charAt(1) || '?'}
                       </div>
                     )}
                   </button>
@@ -172,7 +175,12 @@ function Header({ onLoginClick }) {
                   {dropdownOpen && (
                     <div className="header-dropdown">
                       <div className="header-dropdown-header">
-                        <p className="header-dropdown-email">{user.email}</p>
+                        {userProfile?.fullName && (
+                          <p className="header-dropdown-name">{userProfile.fullName}</p>
+                        )}
+                        <p className="header-dropdown-email">
+                          {userProfile?.email || user.email || user.phoneNumber}
+                        </p>
                       </div>
                       <div className="header-dropdown-divider"></div>
                       <Link 

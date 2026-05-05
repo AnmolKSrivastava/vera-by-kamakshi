@@ -7,7 +7,7 @@ const UserProfileModal = ({ isOpen, onClose, onSubmit, initialData = {}, loading
   const [formData, setFormData] = useState({
     fullName: initialData.fullName || '',
     email: initialData.email || '',
-    phoneNumber: initialData.phoneNumber || ''
+    phoneNumber: initialData.phoneNumber || '+91'
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -18,7 +18,7 @@ const UserProfileModal = ({ isOpen, onClose, onSubmit, initialData = {}, loading
       setFormData({
         fullName: initialData.fullName || '',
         email: initialData.email || '',
-        phoneNumber: initialData.phoneNumber || ''
+        phoneNumber: initialData.phoneNumber || '+91'
       });
     }
   }, [initialData]);
@@ -89,28 +89,18 @@ const UserProfileModal = ({ isOpen, onClose, onSubmit, initialData = {}, loading
   const handlePhoneChange = (e) => {
     let value = e.target.value;
     
-    // Only allow numbers and +
-    value = value.replace(/[^\d+]/g, '');
-    
-    // If user enters without +91, add it
-    if (value && !value.startsWith('+91')) {
-      if (value.startsWith('91')) {
-        value = '+' + value;
-      } else if (value.startsWith('+')) {
-        value = '+91';
-      } else {
-        value = '+91' + value;
-      }
+    // Ensure +91 prefix is always present
+    if (!value.startsWith('+91')) {
+      value = '+91';
     }
     
-    // Limit to +91 and 10 digits
-    if (value.length > 13) {
-      value = value.substring(0, 13);
-    }
-
+    // Only allow digits after +91, limit to 10 digits
+    const digitsOnly = value.slice(3).replace(/\D/g, '');
+    value = '+91' + digitsOnly.slice(0, 10);
+    
     setFormData(prev => ({ ...prev, phoneNumber: value }));
     
-    // Clear error for phone field
+    // Clear error for this field when user starts typing
     if (errors.phoneNumber) {
       setErrors(prev => ({ ...prev, phoneNumber: '' }));
     }
@@ -215,6 +205,7 @@ const UserProfileModal = ({ isOpen, onClose, onSubmit, initialData = {}, loading
               disabled={submitting || loading || !!initialData.phoneNumber}
               autoComplete="tel"
             />
+            <span className="field-hint">Enter your 10-digit mobile number</span>
             {errors.phoneNumber && (
               <span className="field-error">{errors.phoneNumber}</span>
             )}

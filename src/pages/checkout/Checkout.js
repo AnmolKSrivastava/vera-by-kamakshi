@@ -25,7 +25,7 @@ const Checkout = () => {
     city: '',
     state: '',
     pincode: '',
-    phone: ''
+    phone: '+91'
   });
   
   // Payment method
@@ -56,10 +56,29 @@ const Checkout = () => {
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setShippingAddress(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Special handling for phone number
+    if (name === 'phone') {
+      let phoneValue = value;
+      // Ensure +91 prefix is always present
+      if (!phoneValue.startsWith('+91')) {
+        phoneValue = '+91';
+      }
+      // Only allow digits after +91, limit to 10 digits
+      const digitsOnly = phoneValue.slice(3).replace(/\D/g, '');
+      phoneValue = '+91' + digitsOnly.slice(0, 10);
+      
+      setShippingAddress(prev => ({
+        ...prev,
+        [name]: phoneValue
+      }));
+    } else {
+      setShippingAddress(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+    
     // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -128,6 +147,9 @@ const Checkout = () => {
           user?.email || guestEmail
         );
         
+        // Show success message
+        alert('Order placed successfully! Order ID: ' + orderId.slice(0, 8).toUpperCase());
+        
         // Clear cart
         clearCart();
         
@@ -163,6 +185,9 @@ const Checkout = () => {
               },
               user?.email || guestEmail
             );
+            
+            // Show success message
+            alert('Payment successful! Order placed. Order ID: ' + orderId.slice(0, 8).toUpperCase());
             
             clearCart();
             navigate(`/order-confirmation/${orderId}`, {
@@ -287,9 +312,10 @@ const Checkout = () => {
                       name="phone"
                       value={shippingAddress.phone}
                       onChange={handleInputChange}
-                      placeholder="+91 1234567890"
+                      placeholder="+91 XXXXXXXXXX"
                       className={errors.phone ? 'error' : ''}
                     />
+                    <small className="input-hint">Enter your 10-digit mobile number</small>
                     {errors.phone && <span className="error-message">{errors.phone}</span>}
                   </div>
                   
