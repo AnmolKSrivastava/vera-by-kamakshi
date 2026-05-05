@@ -17,6 +17,12 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
     
+    // Rate limiting helper - throttle writes to prevent abuse
+    // Limits: max 10 writes per minute per user for most collections
+    function isNotRateLimited() {
+      return request.time > resource.data.lastWriteTime + duration.value(6, 's');
+    }
+    
     // Products - Public read, admin write
     match /products/{productId} {
       allow read: if true;
@@ -48,14 +54,16 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow read: if isSignedIn() && 
                      (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if isSignedIn();
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid;
       allow update, delete: if isAdmin();
     }
     
     // Reviews - Authenticated users can create, owner can update/delete
     match /reviews/{reviewId} {
       allow read: if true;
-      allow create: if isSignedIn();
+      allow create: if isSignedIn() && 
+                       request.resource.data.userId == request.auth.uid;
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
     

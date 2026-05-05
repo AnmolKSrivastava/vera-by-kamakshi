@@ -44,7 +44,7 @@ const Cart = () => {
             {cartItems.map((item) => (
               <div key={`${item.id}-${JSON.stringify(item.options)}`} className="cart-item">
                 <div className="cart-item-image">
-                  <img src={item.image} alt={item.name} />
+                  <img src={item.image} alt={item.name} loading="lazy" decoding="async" />
                 </div>
                 
                 <div className="cart-item-details">

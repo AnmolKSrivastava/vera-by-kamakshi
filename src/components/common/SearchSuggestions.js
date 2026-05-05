@@ -81,7 +81,7 @@ function SearchSuggestions({ searchTerm, onSelect }) {
             >
               <div className="suggestion-image">
                 {product.imageUrl ? (
-                  <img src={product.imageUrl} alt={product.name} />
+                  <img src={product.imageUrl} alt={product.name} loading="lazy" decoding="async" />
                 ) : (
                   <div className="suggestion-image-placeholder">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#030213" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

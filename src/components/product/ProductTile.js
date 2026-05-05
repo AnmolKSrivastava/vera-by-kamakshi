@@ -95,7 +95,7 @@ const ProductTile = ({ id, image, name, price, colors = [], product, stock }) =>
             {isLowStock && <span className="badge badge-stock badge-low">{lowStockLabel}</span>}
           </div>
           
-          <img src={image} alt={name} className="product-image" />
+          <img src={image} alt={name} className="product-image" loading="lazy" decoding="async" />
           
           {/* Hover Overlay with Actions */}
           <div className={`product-overlay ${isHovered ? 'visible' : ''}`}>

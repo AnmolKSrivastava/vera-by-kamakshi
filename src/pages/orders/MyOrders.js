@@ -118,7 +118,7 @@ const MyOrders = () => {
             <div className="order-items">
               {order.items?.slice(0, 3).map((item, idx) => (
                 <div key={idx} className="order-item">
-                  <img src={item.imageUrl || '/placeholder.jpg'} alt={item.name} className="order-item-image" />
+                  <img src={item.imageUrl || '/placeholder.jpg'} alt={item.name} className="order-item-image" loading="lazy" decoding="async" />
                   <div className="order-item-details">
                     <h4>{item.name}</h4>
                     <p>Qty: {item.quantity} × {formatPrice(item.price)}</p>

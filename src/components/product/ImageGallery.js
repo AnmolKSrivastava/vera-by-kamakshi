@@ -64,6 +64,8 @@ const ImageGallery = ({ images = [], productName }) => {
           src={imageArray[selectedIndex]} 
           alt={`${productName} - View ${selectedIndex + 1}`}
           className="main-image"
+          decoding="async"
+          fetchPriority="high"
           onClick={handleMainImageClick}
         />
         
@@ -94,7 +96,7 @@ const ImageGallery = ({ images = [], productName }) => {
               className={`thumbnail ${selectedIndex === index ? 'active' : ''}`}
               onClick={() => handleThumbnailClick(index)}
             >
-              <img src={image} alt={`${productName} thumbnail ${index + 1}`} />
+              <img src={image} alt={`${productName} thumbnail ${index + 1}`} loading="lazy" decoding="async" />
             </button>
           ))}
         </div>

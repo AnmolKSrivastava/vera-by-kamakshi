@@ -13,21 +13,38 @@ service firebase.storage {
              firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
     }
     
+    // Validate image file type
+    function isValidImageType() {
+      return request.resource.contentType.matches('image/(jpeg|jpg|png|gif|webp)');
+    }
+    
+    // Validate file size (5MB limit for regular uploads, 10MB for admin)
+    function isValidSize(maxSizeMB) {
+      return request.resource.size < maxSizeMB * 1024 * 1024;
+    }
+    
     // Product images - Admin can write, everyone can read
     match /products/{productId}/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAdmin() && 
+                      isValidImageType() && 
+                      isValidSize(10); // 10MB limit for product images
     }
     
     // User uploads - Owner can write, everyone can read
     match /users/{userId}/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isSignedIn() && 
+                      request.auth.uid == userId && 
+                      isValidImageType() && 
+                      isValidSize(5); // 5MB limit for user uploads
     }
     
     // Temporary uploads - Admin only
     match /temp/{allPaths=**} {
-      allow read, write: if isAdmin();
+      allow read, write: if isAdmin() && 
+                            isValidImageType() && 
+                            isValidSize(10);
     }
   }
 }

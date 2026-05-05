@@ -118,28 +118,93 @@ export const initiateRazorpayPayment = async (options) => {
 };
 
 /**
- * Verify payment signature (should be done on backend)
- * This is a placeholder - implement server-side verification
- * @param {Object} paymentData - Payment response data
- * @returns {Promise<boolean>}
+ * Verify payment signature via backend API
+ * IMPORTANT: This must be called before marking order as paid
+ * @param {Object} paymentData - Payment response data from Razorpay
+ * @param {string} paymentData.razorpay_payment_id - Payment ID
+ * @param {string} paymentData.razorpay_order_id - Order ID
+ * @param {string} paymentData.razorpay_signature - Payment signature
+ * @returns {Promise<boolean>} True if signature is valid
  */
 export const verifyPaymentSignature = async (paymentData) => {
   try {
-    // TODO: Implement backend API call to verify signature
-    // const response = await fetch('/api/verify-payment', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(paymentData)
-    // });
-    // return response.ok;
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = paymentData;
     
-    console.warn('Payment signature verification should be implemented on backend');
-    return true; // For development only
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      console.error('Missing required payment verification fields');
+      return false;
+    }
+    
+    // Call backend API to verify signature
+    // TODO: Replace with your actual Cloud Function or backend API endpoint
+    const verificationEndpoint = process.env.REACT_APP_PAYMENT_VERIFICATION_ENDPOINT 
+                                 || 'https://your-region-your-project.cloudfunctions.net/verifyPayment';
+    
+    const response = await fetch(verificationEndpoint, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        razorpay_payment_id,
+        razorpay_order_id,
+        razorpay_signature
+      })
+    });
+    
+    if (!response.ok) {
+      console.error('Payment verification failed:', response.statusText);
+      return false;
+    }
+    
+    const result = await response.json();
+    return result.verified === true;
+    
   } catch (error) {
     console.error('Payment verification error:', error);
     return false;
   }
 };
+
+/**
+ * Backend verification example (to be implemented as Cloud Function)
+ * 
+ * Example Cloud Function code:
+ * 
+ * const crypto = require('crypto');
+ * const functions = require('firebase-functions');
+ * 
+ * exports.verifyPayment = functions.https.onRequest(async (req, res) => {
+ *   // Enable CORS
+ *   res.set('Access-Control-Allow-Origin', 'https://your-domain.com');
+ *   res.set('Access-Control-Allow-Methods', 'POST');
+ *   
+ *   if (req.method === 'OPTIONS') {
+ *     res.status(204).send('');
+ *     return;
+ *   }
+ *   
+ *   try {
+ *     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+ *     const razorpay_key_secret = functions.config().razorpay.secret;
+ *     
+ *     // Generate signature
+ *     const text = `${razorpay_order_id}|${razorpay_payment_id}`;
+ *     const generated_signature = crypto
+ *       .createHmac('sha256', razorpay_key_secret)
+ *       .update(text)
+ *       .digest('hex');
+ *     
+ *     // Compare signatures
+ *     const verified = generated_signature === razorpay_signature;
+ *     
+ *     res.status(200).json({ verified });
+ *   } catch (error) {
+ *     console.error('Verification error:', error);
+ *     res.status(500).json({ verified: false, error: error.message });
+ *   }
+ * });
+ */
 
 /**
  * Get payment method display name

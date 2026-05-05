@@ -178,7 +178,7 @@ const OrderDetails = () => {
           <div className="items-list">
             {order.items?.map((item, idx) => (
               <div key={idx} className="order-item-row">
-                <img src={item.imageUrl || '/placeholder.jpg'} alt={item.name} className="item-image" />
+                <img src={item.imageUrl || '/placeholder.jpg'} alt={item.name} className="item-image" loading="lazy" decoding="async" />
                 <div className="item-details">
                   <h5>{item.name}</h5>
                   {item.size && <p>Size: {item.size}</p>}
