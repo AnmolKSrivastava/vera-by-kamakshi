@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getOrderById, updateOrderStatus } from '../../services/orderService';
+import ActionModal from '../../components/common/ActionModal';
 import { useAuth } from '../../context/AuthContext';
 import './OrderDetails.css';
 
@@ -11,6 +12,13 @@ const OrderDetails = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'default'
+  });
 
   useEffect(() => {
     if (orderId) {
@@ -37,18 +45,27 @@ const OrderDetails = () => {
   };
 
   const handleCancelOrder = async () => {
-    if (window.confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
-      setCancelling(true);
-      try {
-        await updateOrderStatus(orderId, 'cancelled', user?.email || 'User');
-        setOrder(prev => ({ ...prev, status: 'cancelled' }));
-        alert('Order cancelled successfully. Product stock has been restored.');
-      } catch (error) {
-        console.error('Error cancelling order:', error);
-        alert('Failed to cancel order: ' + (error.message || 'Unknown error'));
-      } finally {
-        setCancelling(false);
-      }
+    setCancelling(true);
+    try {
+      await updateOrderStatus(orderId, 'cancelled', user?.email || 'User');
+      setOrder(prev => ({ ...prev, status: 'cancelled' }));
+      setStatusModal({
+        isOpen: true,
+        title: 'Order Cancelled',
+        message: 'Your order has been cancelled successfully.',
+        variant: 'success'
+      });
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      setStatusModal({
+        isOpen: true,
+        title: 'Cancellation Failed',
+        message: error.message || 'We could not cancel your order. Please try again.',
+        variant: 'danger'
+      });
+    } finally {
+      setCancelling(false);
+      setShowCancelModal(false);
     }
   };
 
@@ -225,7 +242,7 @@ const OrderDetails = () => {
           {(order.status === 'pending' || order.status === 'processing') && (
             <button 
               className="cancel-order-btn" 
-              onClick={handleCancelOrder}
+              onClick={() => setShowCancelModal(true)}
               disabled={cancelling}
             >
               {cancelling ? 'Cancelling...' : 'Cancel Order'}
@@ -244,6 +261,29 @@ const OrderDetails = () => {
           </button>
         </div>
       </div>
+
+      <ActionModal
+        isOpen={showCancelModal}
+        title="Cancel This Order?"
+        message="Are you sure you want to cancel this order? This action cannot be undone."
+        confirmText="Yes, Cancel Order"
+        cancelText="Keep Order"
+        onConfirm={handleCancelOrder}
+        onCancel={() => !cancelling && setShowCancelModal(false)}
+        variant="danger"
+        loading={cancelling}
+      />
+
+      <ActionModal
+        isOpen={statusModal.isOpen}
+        title={statusModal.title}
+        message={statusModal.message}
+        confirmText="Close"
+        showCancel={false}
+        onConfirm={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        variant={statusModal.variant}
+      />
     </div>
   );
 };

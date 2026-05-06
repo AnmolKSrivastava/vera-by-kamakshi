@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserOrders } from '../../services/orderService';
+import { cancelOrder, getUserOrders } from '../../services/orderService';
+import ActionModal from '../../components/common/ActionModal';
 import { useAuth } from '../../context/AuthContext';
 import './MyOrders.css';
 
@@ -10,6 +11,14 @@ const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, processing, shipped, delivered, cancelled
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+  const [confirmCancelOrderId, setConfirmCancelOrderId] = useState(null);
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'default'
+  });
 
   useEffect(() => {
     if (user) {
@@ -32,6 +41,40 @@ const MyOrders = () => {
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(price);
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    setCancellingOrderId(orderId);
+
+    try {
+      await cancelOrder(orderId, '', user?.email || 'User');
+      setOrders((prevOrders) => prevOrders.map((order) => (
+        order.id === orderId
+          ? {
+              ...order,
+              status: 'cancelled',
+              cancelledAt: new Date().toISOString(),
+            }
+          : order
+      )));
+      setStatusModal({
+        isOpen: true,
+        title: 'Order Cancelled',
+        message: 'Your order has been cancelled successfully.',
+        variant: 'success'
+      });
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      setStatusModal({
+        isOpen: true,
+        title: 'Cancellation Failed',
+        message: error.message || 'We could not cancel your order. Please try again.',
+        variant: 'danger'
+      });
+    } finally {
+      setCancellingOrderId(null);
+      setConfirmCancelOrderId(null);
+    }
   };
 
   if (loading) {
@@ -147,7 +190,13 @@ const MyOrders = () => {
                   <button className="order-btn">Download Invoice</button>
                 )}
                 {(order.status === 'pending' || order.status === 'processing') && (
-                  <button className="order-btn">Cancel Order</button>
+                  <button
+                    className="order-btn"
+                    onClick={() => setConfirmCancelOrderId(order.id)}
+                    disabled={cancellingOrderId === order.id}
+                  >
+                    {cancellingOrderId === order.id ? 'Cancelling...' : 'Cancel Order'}
+                  </button>
                 )}
               </div>
             </div>
@@ -161,6 +210,29 @@ const MyOrders = () => {
           <p>You don't have any orders with this status.</p>
         </div>
       )}
+
+      <ActionModal
+        isOpen={Boolean(confirmCancelOrderId)}
+        title="Cancel This Order?"
+        message="Are you sure you want to cancel this order? This action cannot be undone."
+        confirmText="Yes, Cancel Order"
+        cancelText="Keep Order"
+        onConfirm={() => handleCancelOrder(confirmCancelOrderId)}
+        onCancel={() => !cancellingOrderId && setConfirmCancelOrderId(null)}
+        variant="danger"
+        loading={Boolean(cancellingOrderId)}
+      />
+
+      <ActionModal
+        isOpen={statusModal.isOpen}
+        title={statusModal.title}
+        message={statusModal.message}
+        confirmText="Close"
+        showCancel={false}
+        onConfirm={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        variant={statusModal.variant}
+      />
     </div>
   );
 };

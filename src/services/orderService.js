@@ -5,6 +5,50 @@ import { collection, addDoc, getDocs, getDoc, doc, updateDoc, query, where, orde
 const ORDERS_COLLECTION = 'orders';
 const PRODUCTS_COLLECTION = 'products';
 
+const resolveOrderItemImage = async (item) => {
+  const existingImage = item.imageUrl || item.image || item.images?.[0] || null;
+
+  if (existingImage) {
+    return existingImage;
+  }
+
+  if (!item.productId) {
+    return null;
+  }
+
+  try {
+    const productSnap = await getDoc(doc(db, PRODUCTS_COLLECTION, item.productId));
+
+    if (!productSnap.exists()) {
+      return null;
+    }
+
+    const productData = productSnap.data();
+    return productData.imageUrl || productData.image || productData.images?.[0] || null;
+  } catch (error) {
+    console.error(`Error resolving image for order item ${item.productId}:`, error);
+    return null;
+  }
+};
+
+const enrichOrderImages = async (order) => {
+  if (!order?.items?.length) {
+    return order;
+  }
+
+  const items = await Promise.all(
+    order.items.map(async (item) => ({
+      ...item,
+      imageUrl: await resolveOrderItemImage(item)
+    }))
+  );
+
+  return {
+    ...order,
+    items
+  };
+};
+
 // Create a new order
 export const createOrder = async (orderData) => {
   const order = {
@@ -18,7 +62,15 @@ export const createOrder = async (orderData) => {
 };
 
 // Helper function to create order from cart
-export const createOrderFromCart = async (userId, cartItems, shippingAddress, paymentMethod = 'COD', paymentDetails = {}, userEmail = null) => {
+export const createOrderFromCart = async (
+  userId, 
+  cartItems, 
+  shippingAddress, 
+  paymentMethod = 'COD', 
+  paymentDetails = {}, 
+  userEmail = null,
+  orderExtras = {} // Additional order details like shipping method, gift wrap, coupon
+) => {
   // First, validate stock availability for all items
   const stockChecks = await Promise.all(
     cartItems.map(async (item) => {
@@ -69,13 +121,17 @@ export const createOrderFromCart = async (userId, cartItems, shippingAddress, pa
 
   // Calculate order totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shippingCost = subtotal > 999 ? 0 : 99; // Free shipping above 999
-  const discount = 0;
-  const totalAmount = subtotal + shippingCost - discount;
+  const shippingCost = orderExtras.shippingCost !== undefined ? orderExtras.shippingCost : (subtotal > 999 ? 0 : 99);
+  const giftWrapCost = orderExtras.giftWrapCost || 0;
+  const discount = orderExtras.couponDiscount || 0;
+  const totalAmount = subtotal + shippingCost + giftWrapCost - discount;
 
   // Use Firestore transaction to atomically reduce stock and create order
   const orderId = await runTransaction(db, async (transaction) => {
-    // Re-check and update stock for each product within transaction
+    // Firestore transactions require all reads to complete before any writes.
+    const stockUpdates = [];
+
+    // Re-check stock for each product within transaction
     for (const item of cartItems) {
       const productRef = doc(db, PRODUCTS_COLLECTION, item.id);
       const productSnap = await transaction.get(productRef);
@@ -89,26 +145,12 @@ export const createOrderFromCart = async (userId, cartItems, shippingAddress, pa
       if (currentStock < item.quantity) {
         throw new Error(`Insufficient stock for ${item.name}. Only ${currentStock} available`);
       }
-      
-      // Reduce stock
-      const newStock = currentStock - item.quantity;
-      transaction.update(productRef, {
-        stock: newStock,
-        updatedAt: new Date().toISOString()
-      });
-      
-      // Log stock change to history
-      const stockHistoryRef = doc(collection(db, 'stockHistory'));
-      transaction.set(stockHistoryRef, {
-        productId: item.id,
-        productName: item.name,
-        oldStock: currentStock,
-        newStock: newStock,
-        change: -item.quantity,
-        reason: 'Order Placed',
-        orderId: 'pending', // Will be updated after order creation
-        updatedBy: userEmail || userId,
-        timestamp: new Date().toISOString()
+
+      stockUpdates.push({
+        item,
+        productRef,
+        currentStock,
+        newStock: currentStock - item.quantity
       });
     }
 
@@ -121,7 +163,7 @@ export const createOrderFromCart = async (userId, cartItems, shippingAddress, pa
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        imageUrl: item.imageUrl || item.images?.[0] || null,
+        imageUrl: item.imageUrl || item.image || item.images?.[0] || null,
         size: item.selectedSize || null,
         color: item.selectedColor || null,
         sku: item.sku || null,
@@ -138,6 +180,11 @@ export const createOrderFromCart = async (userId, cartItems, shippingAddress, pa
       },
       subtotal,
       shippingCost,
+      shippingMethod: orderExtras.shippingMethod || 'standard',
+      giftWrap: orderExtras.giftWrap || false,
+      giftWrapCost,
+      giftMessage: orderExtras.giftMessage || '',
+      couponCode: orderExtras.couponCode || '',
       discount,
       totalAmount,
       paymentMethod,
@@ -148,6 +195,28 @@ export const createOrderFromCart = async (userId, cartItems, shippingAddress, pa
     };
 
     const orderRef = doc(collection(db, ORDERS_COLLECTION));
+
+    // Apply stock updates and stock history writes after all reads are complete.
+    for (const { item, productRef, currentStock, newStock } of stockUpdates) {
+      transaction.update(productRef, {
+        stock: newStock,
+        updatedAt: new Date().toISOString()
+      });
+
+      const stockHistoryRef = doc(collection(db, 'stockHistory'));
+      transaction.set(stockHistoryRef, {
+        productId: item.id,
+        productName: item.name,
+        oldStock: currentStock,
+        newStock,
+        change: -item.quantity,
+        reason: 'Order Placed',
+        orderId: orderRef.id,
+        updatedBy: userEmail || userId,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     transaction.set(orderRef, orderData);
     
     return orderRef.id;
@@ -160,7 +229,7 @@ export const createOrderFromCart = async (userId, cartItems, shippingAddress, pa
 export const getUserOrders = async (userId) => {
   const q = query(collection(db, ORDERS_COLLECTION), where('userId', '==', userId), orderBy('createdAt', 'desc'));
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return Promise.all(querySnapshot.docs.map(async (orderDoc) => enrichOrderImages({ id: orderDoc.id, ...orderDoc.data() })));
 };
 
 // Get all orders (admin)
@@ -173,7 +242,7 @@ export const getAllOrders = async () => {
 // Get order by ID
 export const getOrderById = async (orderId) => {
   const docSnap = await getDoc(doc(db, ORDERS_COLLECTION, orderId));
-  return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
+  return docSnap.exists() ? enrichOrderImages({ id: docSnap.id, ...docSnap.data() }) : null;
 };
 
 // Update order status
@@ -249,6 +318,8 @@ export const cancelOrder = async (orderId, reason = '', cancelledBy = 'User') =>
 // Helper function to restore stock when order is cancelled
 const restoreStockForOrder = async (orderId, items, updatedBy) => {
   await runTransaction(db, async (transaction) => {
+    const stockRestorations = [];
+
     for (const item of items) {
       const productRef = doc(db, PRODUCTS_COLLECTION, item.productId);
       const productSnap = await transaction.get(productRef);
@@ -259,20 +330,26 @@ const restoreStockForOrder = async (orderId, items, updatedBy) => {
       }
       
       const currentStock = productSnap.data().stock || 0;
-      const newStock = currentStock + item.quantity;
-      
+      stockRestorations.push({
+        item,
+        productRef,
+        currentStock,
+        newStock: currentStock + item.quantity
+      });
+    }
+
+    for (const { item, productRef, currentStock, newStock } of stockRestorations) {
       transaction.update(productRef, {
         stock: newStock,
         updatedAt: new Date().toISOString()
       });
-      
-      // Log stock restoration to history
+
       const stockHistoryRef = doc(collection(db, 'stockHistory'));
       transaction.set(stockHistoryRef, {
         productId: item.productId,
         productName: item.name,
         oldStock: currentStock,
-        newStock: newStock,
+        newStock,
         change: item.quantity,
         reason: 'Order Cancelled',
         orderId: orderId,

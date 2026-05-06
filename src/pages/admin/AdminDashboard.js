@@ -310,6 +310,39 @@ const AdminDashboard = () => {
     }
   };
   
+  // Sync Stock Handler - Ensures all products have stock field
+  const handleSyncStock = async () => {
+    if (!window.confirm('This will ensure all products have a stock field set to 0 if missing. Continue?')) {
+      return;
+    }
+    
+    setLoadingProducts(true);
+    try {
+      const result = await productService.syncProductStock();
+      
+      // Refresh products list
+      const productList = await productService.getAll();
+      setProducts(productList);
+      
+      alert(
+        `Stock Sync Complete!\n\n` +
+        `Total Products: ${result.totalProducts}\n` +
+        `Updated: ${result.updatedCount}\n` +
+        `Already Synced: ${result.alreadySyncedCount}\n\n` +
+        (result.results.length > 0 
+          ? `Updated products:\n${result.results.map(r => `- ${r.name}: ${r.oldStock} → ${r.newStock}`).join('\n')}`
+          : 'All products already had valid stock values.')
+      );
+      
+      await logActivity('SYNC_STOCK', `Synced stock for ${result.updatedCount} products`);
+    } catch (err) {
+      console.error('Error syncing stock:', err);
+      alert('Error syncing stock: ' + err.message);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+  
   const handleStockChange = (productId, addStock) => {
     setBulkUpdateProducts(prev => {
       const existing = prev.find(p => p.id === productId);
@@ -1639,6 +1672,39 @@ const AdminDashboard = () => {
         {activeSection === "inventory" && (
           <div className="inventory-section">
             <h1 className="admin-title">Inventory Management</h1>
+            
+            {/* Sync Stock Button */}
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px solid #dee2e6' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: '#495057', fontSize: '1rem' }}>📦 Sync Stock Database</h3>
+                  <p style={{ margin: 0, color: '#6c757d', fontSize: '0.875rem' }}>
+                    Ensure all products have a stock field. Products without stock will be set to 0 (out of stock).
+                  </p>
+                </div>
+                <button 
+                  onClick={handleSyncStock}
+                  disabled={loadingProducts}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: '#17a2b8',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: loadingProducts ? 'not-allowed' : 'pointer',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    opacity: loadingProducts ? 0.6 : 1,
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onMouseEnter={(e) => !loadingProducts && (e.target.style.backgroundColor = '#138496')}
+                  onMouseLeave={(e) => !loadingProducts && (e.target.style.backgroundColor = '#17a2b8')}
+                >
+                  {loadingProducts ? '⏳ Syncing...' : '🔄 Sync Stock Now'}
+                </button>
+              </div>
+            </div>
             
             {/* Inventory Overview */}
             <div className="inventory-overview">

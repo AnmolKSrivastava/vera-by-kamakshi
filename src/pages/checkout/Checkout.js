@@ -1,18 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import ActionModal from '../../components/common/ActionModal';
 import { createOrderFromCart } from '../../services/orderService';
 import './Checkout.css';
 
+// Payment logos
+import codLogo from '../../assets/Payment/cash-on-delivery.svg';
+import upiLogo from '../../assets/Payment/google-pay.svg';
+import visaLogo from '../../assets/Payment/visa.svg';
+import mastercardLogo from '../../assets/Payment/mastercard.svg';
+
 const Checkout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { cartItems, clearCart } = useCart();
   
+  // Get cart preferences from navigation state
+  const cartPreferences = location.state || {};
+  const {
+    shippingMethod = 'standard',
+    shippingCost: passedShippingCost = 0,
+    giftWrap = false,
+    giftWrapCost: passedGiftWrapCost = 0,
+    giftMessage = '',
+    couponDiscount = 0,
+    couponCode = ''
+  } = cartPreferences;
+  
   const [step, setStep] = useState(1); // 1: Address, 2: Payment
   const [loading, setLoading] = useState(false);
+  const orderPlacedRef = useRef(false);
   const [errors, setErrors] = useState({});
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'default'
+  });
+
+  const scrollPageToTop = () => {
+    window.scrollTo(0, 0);
+
+    if (document.documentElement) {
+      document.documentElement.scrollTop = 0;
+    }
+
+    if (document.body) {
+      document.body.scrollTop = 0;
+    }
+  };
   
   // Guest user info (if not logged in)
   const [guestEmail, setGuestEmail] = useState('');
@@ -33,13 +72,14 @@ const Checkout = () => {
   
   // Order summary calculations
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shippingCost = subtotal > 999 ? 0 : 99;
-  const discount = 0;
-  const total = subtotal + shippingCost - discount;
+  const shippingCost = passedShippingCost;
+  const giftWrapCost = passedGiftWrapCost;
+  const discount = couponDiscount;
+  const total = subtotal + shippingCost + giftWrapCost - discount;
   
   useEffect(() => {
-    // Redirect if cart is empty
-    if (cartItems.length === 0) {
+    // Redirect if cart is empty (but not if we just placed an order)
+    if (cartItems.length === 0 && !orderPlacedRef.current) {
       navigate('/cart');
     }
     
@@ -53,6 +93,14 @@ const Checkout = () => {
       }));
     }
   }, [cartItems, user, navigate]);
+
+  useEffect(() => {
+    scrollPageToTop();
+
+    requestAnimationFrame(() => {
+      scrollPageToTop();
+    });
+  }, [step]);
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -144,23 +192,34 @@ const Checkout = () => {
           shippingAddress,
           'COD',
           { status: 'pending' },
-          user?.email || guestEmail
+          user?.email || guestEmail,
+          {
+            shippingMethod,
+            shippingCost,
+            giftWrap,
+            giftWrapCost,
+            giftMessage,
+            couponCode,
+            couponDiscount
+          }
         );
         
-        // Show success message
-        alert('Order placed successfully! Order ID: ' + orderId.slice(0, 8).toUpperCase());
-        
-        // Clear cart
+        const successPayload = {
+          orderId,
+          total,
+          paymentMethod: 'COD'
+        };
+
+        sessionStorage.setItem('checkoutSuccess', JSON.stringify(successPayload));
+
+        // Set flag before clearing cart to prevent empty-cart redirect
+        orderPlacedRef.current = true;
         clearCart();
         
         // Navigate to confirmation
         navigate(`/order-confirmation/${orderId}`, {
           state: { 
-            orderDetails: { 
-              orderId, 
-              total, 
-              paymentMethod: 'COD' 
-            } 
+            orderDetails: successPayload
           }
         });
       } else {
@@ -183,21 +242,32 @@ const Checkout = () => {
                 status: 'paid',
                 transactionId: response.razorpay_payment_id
               },
-              user?.email || guestEmail
+              user?.email || guestEmail,
+              {
+                shippingMethod,
+                shippingCost,
+                giftWrap,
+                giftWrapCost,
+                giftMessage,
+                couponCode,
+                couponDiscount
+              }
             );
             
-            // Show success message
-            alert('Payment successful! Order placed. Order ID: ' + orderId.slice(0, 8).toUpperCase());
-            
+            const successPayload = {
+              orderId,
+              total,
+              paymentMethod,
+              transactionId: response.razorpay_payment_id
+            };
+
+            sessionStorage.setItem('checkoutSuccess', JSON.stringify(successPayload));
+
+            orderPlacedRef.current = true;
             clearCart();
             navigate(`/order-confirmation/${orderId}`, {
               state: { 
-                orderDetails: { 
-                  orderId, 
-                  total, 
-                  paymentMethod,
-                  transactionId: response.razorpay_payment_id
-                } 
+                orderDetails: successPayload
               }
             });
           },
@@ -227,11 +297,26 @@ const Checkout = () => {
       
       // Check if it's a stock-related error
       if (error.message && error.message.includes('Stock issues')) {
-        alert('Cannot place order:\n\n' + error.message.split('Stock issues:')[1]);
+        setStatusModal({
+          isOpen: true,
+          title: 'Cannot Place Order',
+          message: error.message.split('Stock issues:')[1].trim(),
+          variant: 'danger'
+        });
       } else if (error.message && error.message.includes('Insufficient stock')) {
-        alert('Cannot place order: ' + error.message);
+        setStatusModal({
+          isOpen: true,
+          title: 'Cannot Place Order',
+          message: error.message,
+          variant: 'danger'
+        });
       } else {
-        alert('Failed to place order. Please try again.');
+        setStatusModal({
+          isOpen: true,
+          title: 'Checkout Failed',
+          message: 'Failed to place order. Please try again.',
+          variant: 'danger'
+        });
       }
       
       setLoading(false);
@@ -245,19 +330,31 @@ const Checkout = () => {
   return (
     <div className="checkout-page">
       <div className="checkout-container">
-        <div className="checkout-header">
-          <h1>Checkout</h1>
-          <div className="checkout-steps">
-            <div className={`step ${step >= 1 ? 'active' : ''}`}>
-              <span className="step-number">1</span>
-              <span className="step-label">Shipping Address</span>
-            </div>
-            <div className="step-divider"></div>
-            <div className={`step ${step >= 2 ? 'active' : ''}`}>
-              <span className="step-number">2</span>
-              <span className="step-label">Payment</span>
-            </div>
+        {/* Progress Indicator */}
+        <div className="checkout-progress">
+          <div className="progress-step completed">
+            <div className="step-number">1</div>
+            <div className="step-label">Shopping Cart</div>
           </div>
+          <div className="progress-line completed"></div>
+          <div className={`progress-step ${step >= 2 ? 'completed' : step === 1 ? 'active' : ''}`}>
+            <div className="step-number">2</div>
+            <div className="step-label">Checkout</div>
+          </div>
+          <div className={`progress-line ${step >= 2 ? 'completed' : ''}`}></div>
+          <div className={`progress-step ${step === 2 ? 'active' : ''}`}>
+            <div className="step-number">3</div>
+            <div className="step-label">Payment</div>
+          </div>
+          <div className="progress-line"></div>
+          <div className="progress-step">
+            <div className="step-number">4</div>
+            <div className="step-label">Complete</div>
+          </div>
+        </div>
+        
+        <div className="checkout-header">
+          <h1>{step === 1 ? 'Shipping Details' : 'Payment Method'}</h1>
         </div>
         
         <div className="checkout-content">
@@ -404,74 +501,80 @@ const Checkout = () => {
                 </button>
                 
                 <h2>Select Payment Method</h2>
+                <p className="payment-subtitle">Choose how you'd like to pay for your order</p>
                 
                 <div className="payment-methods">
                   <div 
                     className={`payment-option ${paymentMethod === 'COD' ? 'selected' : ''}`}
                     onClick={() => setPaymentMethod('COD')}
                   >
-                    <input 
-                      type="radio" 
-                      name="payment" 
-                      value="COD" 
-                      checked={paymentMethod === 'COD'}
-                      onChange={() => setPaymentMethod('COD')}
-                    />
+                    <div className="payment-radio">
+                      <input 
+                        type="radio" 
+                        name="payment" 
+                        value="COD" 
+                        checked={paymentMethod === 'COD'}
+                        onChange={() => setPaymentMethod('COD')}
+                      />
+                      <span className="radio-checkmark"></span>
+                    </div>
+                    <div className="payment-icon cod-icon">
+                      <img src={codLogo} alt="Cash on Delivery" />
+                    </div>
                     <div className="payment-details">
-                      <h4>Cash on Delivery (COD)</h4>
+                      <h4>Cash on Delivery</h4>
                       <p>Pay with cash when your order is delivered</p>
                     </div>
+                    {paymentMethod === 'COD' && <span className="selected-badge">✓</span>}
                   </div>
                   
                   <div 
                     className={`payment-option ${paymentMethod === 'UPI' ? 'selected' : ''}`}
                     onClick={() => setPaymentMethod('UPI')}
                   >
-                    <input 
-                      type="radio" 
-                      name="payment" 
-                      value="UPI" 
-                      checked={paymentMethod === 'UPI'}
-                      onChange={() => setPaymentMethod('UPI')}
-                    />
-                    <div className="payment-details">
-                      <h4>UPI</h4>
-                      <p>Pay with Google Pay, PhonePe, Paytm & more</p>
+                    <div className="payment-radio">
+                      <input 
+                        type="radio" 
+                        name="payment" 
+                        value="UPI" 
+                        checked={paymentMethod === 'UPI'}
+                        onChange={() => setPaymentMethod('UPI')}
+                      />
+                      <span className="radio-checkmark"></span>
                     </div>
+                    <div className="payment-icon upi-icon">
+                      <img src={upiLogo} alt="UPI Payment" />
+                    </div>
+                    <div className="payment-details">
+                      <h4>UPI Payment</h4>
+                      <p>Google Pay, PhonePe, Paytm & more</p>
+                    </div>
+                    {paymentMethod === 'UPI' && <span className="selected-badge">✓</span>}
                   </div>
                   
                   <div 
                     className={`payment-option ${paymentMethod === 'Card' ? 'selected' : ''}`}
                     onClick={() => setPaymentMethod('Card')}
                   >
-                    <input 
-                      type="radio" 
-                      name="payment" 
-                      value="Card" 
-                      checked={paymentMethod === 'Card'}
-                      onChange={() => setPaymentMethod('Card')}
-                    />
+                    <div className="payment-radio">
+                      <input 
+                        type="radio" 
+                        name="payment" 
+                        value="Card" 
+                        checked={paymentMethod === 'Card'}
+                        onChange={() => setPaymentMethod('Card')}
+                      />
+                      <span className="radio-checkmark"></span>
+                    </div>
+                    <div className="payment-icon card-icon">
+                      <img src={visaLogo} alt="Visa" className="card-logo" />
+                      <img src={mastercardLogo} alt="Mastercard" className="card-logo" />
+                    </div>
                     <div className="payment-details">
                       <h4>Credit/Debit Card</h4>
                       <p>Visa, Mastercard, Rupay & more</p>
                     </div>
-                  </div>
-                  
-                  <div 
-                    className={`payment-option ${paymentMethod === 'NetBanking' ? 'selected' : ''}`}
-                    onClick={() => setPaymentMethod('NetBanking')}
-                  >
-                    <input 
-                      type="radio" 
-                      name="payment" 
-                      value="NetBanking" 
-                      checked={paymentMethod === 'NetBanking'}
-                      onChange={() => setPaymentMethod('NetBanking')}
-                    />
-                    <div className="payment-details">
-                      <h4>Net Banking</h4>
-                      <p>All major banks supported</p>
-                    </div>
+                    {paymentMethod === 'Card' && <span className="selected-badge">✓</span>}
                   </div>
                 </div>
                 
@@ -493,7 +596,17 @@ const Checkout = () => {
             <div className="summary-items">
               {cartItems.map((item, idx) => (
                 <div key={idx} className="summary-item">
-                  <img src={item.imageUrl || item.images?.[0]} alt={item.name} />
+                  {(item.imageUrl || item.image || item.images?.[0]) ? (
+                    <img src={item.imageUrl || item.image || item.images?.[0]} alt={item.name} />
+                  ) : (
+                    <div className="summary-item-placeholder">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#030213" strokeWidth="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
+                    </div>
+                  )}
                   <div className="item-info">
                     <h4>{item.name}</h4>
                     <p>Qty: {item.quantity}</p>
@@ -511,12 +624,18 @@ const Checkout = () => {
                 <span>{formatPrice(subtotal)}</span>
               </div>
               <div className="total-row">
-                <span>Shipping</span>
+                <span>Shipping ({shippingMethod === 'express' ? 'Express 2-3 days' : 'Standard 5-7 days'})</span>
                 <span>{shippingCost === 0 ? 'FREE' : formatPrice(shippingCost)}</span>
               </div>
+              {giftWrap && (
+                <div className="total-row">
+                  <span>Gift Wrap</span>
+                  <span>{formatPrice(giftWrapCost)}</span>
+                </div>
+              )}
               {discount > 0 && (
                 <div className="total-row discount">
-                  <span>Discount</span>
+                  <span>Discount {couponCode && `(${couponCode})`}</span>
                   <span>-{formatPrice(discount)}</span>
                 </div>
               )}
@@ -526,14 +645,25 @@ const Checkout = () => {
               </div>
             </div>
             
-            {subtotal < 999 && (
-              <div className="shipping-notice">
-                Add {formatPrice(999 - subtotal)} more for FREE shipping!
+            {giftWrap && giftMessage && (
+              <div className="shipping-notice" style={{background: '#f0f9ff', borderLeft: '3px solid #3b82f6'}}>
+                <strong>Gift Message:</strong> {giftMessage}
               </div>
             )}
           </div>
         </div>
       </div>
+
+      <ActionModal
+        isOpen={statusModal.isOpen}
+        title={statusModal.title}
+        message={statusModal.message}
+        confirmText="Close"
+        showCancel={false}
+        onConfirm={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        variant={statusModal.variant}
+      />
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getProductReviews, addReview, getProductRating } from '../../services/reviewService';
+import ActionModal from '../common/ActionModal';
 import './ReviewsSection.css';
 
 const ReviewsSection = ({ productId, productName }) => {
@@ -14,6 +15,12 @@ const ReviewsSection = ({ productId, productName }) => {
   const [reviewText, setReviewText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'default'
+  });
   const [ratingStats, setRatingStats] = useState({
     averageRating: 0,
     totalReviews: 0,
@@ -44,17 +51,32 @@ const ReviewsSection = ({ productId, productName }) => {
     e.preventDefault();
     
     if (!user) {
-      alert('Please sign in to write a review');
+      setStatusModal({
+        isOpen: true,
+        title: 'Sign In Required',
+        message: 'Please sign in to write a review.',
+        variant: 'default'
+      });
       return;
     }
 
     if (rating === 0) {
-      alert('Please select a rating');
+      setStatusModal({
+        isOpen: true,
+        title: 'Rating Required',
+        message: 'Please select a rating before submitting your review.',
+        variant: 'danger'
+      });
       return;
     }
 
     if (reviewText.trim().length < 10) {
-      alert('Please write at least 10 characters');
+      setStatusModal({
+        isOpen: true,
+        title: 'Review Too Short',
+        message: 'Please write at least 10 characters.',
+        variant: 'danger'
+      });
       return;
     }
 
@@ -88,7 +110,12 @@ const ReviewsSection = ({ productId, productName }) => {
       setTimeout(() => setSubmitSuccess(false), 3000);
     } catch (error) {
       console.error('Error submitting review:', error);
-      alert('Failed to submit review. Please try again.');
+      setStatusModal({
+        isOpen: true,
+        title: 'Review Failed',
+        message: 'Failed to submit review. Please try again.',
+        variant: 'danger'
+      });
     } finally {
       setSubmitting(false);
     }
@@ -96,7 +123,12 @@ const ReviewsSection = ({ productId, productName }) => {
 
   const handleHelpful = async (reviewId) => {
     if (!user) {
-      alert('Please sign in to mark reviews as helpful');
+      setStatusModal({
+        isOpen: true,
+        title: 'Sign In Required',
+        message: 'Please sign in to mark reviews as helpful.',
+        variant: 'default'
+      });
       return;
     }
 
@@ -246,7 +278,12 @@ const ReviewsSection = ({ productId, productName }) => {
           className="write-review-btn"
           onClick={() => {
             if (!user) {
-              alert('Please sign in to write a review');
+              setStatusModal({
+                isOpen: true,
+                title: 'Sign In Required',
+                message: 'Please sign in to write a review.',
+                variant: 'default'
+              });
               return;
             }
             setShowReviewForm(true);
@@ -307,6 +344,17 @@ const ReviewsSection = ({ productId, productName }) => {
           </form>
         </div>
       )}
+
+      <ActionModal
+        isOpen={statusModal.isOpen}
+        title={statusModal.title}
+        message={statusModal.message}
+        confirmText="Close"
+        showCancel={false}
+        onConfirm={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        variant={statusModal.variant}
+      />
     </div>
   );
 };

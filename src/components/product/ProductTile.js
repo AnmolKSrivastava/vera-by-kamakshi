@@ -3,15 +3,24 @@ import "./ProductTile.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import ActionModal from "../common/ActionModal";
 import reviewService from "../../services/reviewService";
 
 const ProductTile = ({ id, image, name, price, colors = [], product, stock }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const { openLoginModal } = useAuth();
   const navigate = useNavigate();
   const [rating, setRating] = useState(null);
   const [reviewCount, setReviewCount] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'default'
+  });
   
   // Get product data
   const productData = product || { id, image, imageUrl: image, name, price, colors, stock };
@@ -22,10 +31,18 @@ const ProductTile = ({ id, image, name, price, colors = [], product, stock }) =>
   
   // Determine stock status
   const productStock = stock !== undefined ? stock : productData?.stock;
+  const isAvailable = productData?.available !== undefined ? productData.available : true; // Default to available
+  
   const hasStockData = productStock !== undefined && productStock !== null && productStock !== '';
-  const numericStock = hasStockData ? Number(productStock) || 0 : null;
+  const numericStock = hasStockData ? Number(productStock) : null;
   const isLowStock = hasStockData && numericStock > 0 && numericStock <= 10;
-  const isOutOfStock = hasStockData && numericStock === 0;
+  
+  // Product is out of stock if:
+  // 1. stock field exists and equals 0, OR
+  // 2. available field exists and is false, OR
+  // 3. stock field doesn't exist but available is explicitly false
+  const isOutOfStock = (hasStockData && numericStock === 0) || isAvailable === false;
+  
   const lowStockLabel = numericStock === 1 ? '1 ITEM LEFT' : `ONLY ${numericStock} LEFT`;
   
   // Calculate if product is new (created within 7 days)
@@ -57,14 +74,42 @@ const ProductTile = ({ id, image, name, price, colors = [], product, stock }) =>
   const handleWishlistClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleWishlist(productData);
+    const result = toggleWishlist(productData);
+    if (result === false) {
+      // User not authenticated, show login modal
+      openLoginModal();
+    }
   };
   
-  const handleQuickAdd = (e) => {
+  const handleQuickAdd = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (!isOutOfStock) {
-      addToCart(productData);
+      const cartItem = {
+        ...productData,
+        stock: productStock,
+        available: isAvailable
+      };
+      const result = await addToCart(cartItem);
+      if (!result.success) {
+        if (result.error === 'auth_required') {
+          openLoginModal();
+        } else if (result.error === 'out_of_stock') {
+          setStatusModal({
+            isOpen: true,
+            title: 'Out of Stock',
+            message: 'This item is currently out of stock.',
+            variant: 'danger'
+          });
+        } else if (result.error === 'insufficient_stock') {
+          setStatusModal({
+            isOpen: true,
+            title: 'Limited Stock',
+            message: `Only ${result.available} item(s) available right now.`,
+            variant: 'danger'
+          });
+        }
+      }
     }
   };
   
@@ -75,14 +120,15 @@ const ProductTile = ({ id, image, name, price, colors = [], product, stock }) =>
   };
 
   return (
-    <Link 
-      to={`/product/${id}`} 
-      className="product-tile-link" 
-      style={{ textDecoration: 'none', color: 'inherit' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="product-tile">
+    <>
+      <Link 
+        to={`/product/${id}`} 
+        className="product-tile-link" 
+        style={{ textDecoration: 'none', color: 'inherit' }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className={`product-tile ${isOutOfStock ? 'out-of-stock' : ''}`}>
         <div className="product-image-container">
           {/* Top Badges */}
           <div className="product-badges">
@@ -98,7 +144,7 @@ const ProductTile = ({ id, image, name, price, colors = [], product, stock }) =>
           <img src={image} alt={name} className="product-image" loading="lazy" decoding="async" />
           
           {/* Hover Overlay with Actions */}
-          <div className={`product-overlay ${isHovered ? 'visible' : ''}`}>
+          <div className={`product-overlay ${isHovered && !isOutOfStock ? 'visible' : ''}`}>
             <div className="quick-actions">
               <button className="quick-action-btn" onClick={handleQuickView} title="Quick View">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -192,8 +238,20 @@ const ProductTile = ({ id, image, name, price, colors = [], product, stock }) =>
             </div>
           )}
         </div>
-      </div>
-    </Link>
+        </div>
+      </Link>
+
+      <ActionModal
+        isOpen={statusModal.isOpen}
+        title={statusModal.title}
+        message={statusModal.message}
+        confirmText="Close"
+        showCancel={false}
+        onConfirm={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        variant={statusModal.variant}
+      />
+    </>
   );
 };
 

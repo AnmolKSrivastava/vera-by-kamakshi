@@ -47,8 +47,14 @@ export const productService = {
    */
   async create(productData) {
     try {
+      // Ensure stock is always a number (default to 0)
+      const stock = productData.stock !== undefined && productData.stock !== null && productData.stock !== ''
+        ? Number(productData.stock)
+        : 0;
+      
       const docRef = await addDoc(collection(db, 'products'), {
         ...productData,
+        stock, // Ensure stock is always set
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
@@ -67,9 +73,15 @@ export const productService = {
    */
   async update(id, productData) {
     try {
+      // Ensure stock is always a number (default to 0)
+      const stock = productData.stock !== undefined && productData.stock !== null && productData.stock !== ''
+        ? Number(productData.stock)
+        : 0;
+      
       const docRef = doc(db, 'products', id);
       await updateDoc(docRef, {
         ...productData,
+        stock, // Ensure stock is always set
         updatedAt: new Date().toISOString()
       });
     } catch (error) {
@@ -121,6 +133,76 @@ export const productService = {
       }
     } catch (error) {
       console.error('Error fetching featured products:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Sync all products to ensure stock field exists and is a number
+   * Sets stock to 0 for products without stock field
+   * @returns {Promise<Object>} Summary of sync operation
+   */
+  async syncProductStock() {
+    try {
+      const products = await this.getAll();
+      let updatedCount = 0;
+      let alreadySyncedCount = 0;
+      const results = [];
+
+      for (const product of products) {
+        // Check if stock field is missing, null, undefined, or empty string
+        const hasValidStock = product.stock !== undefined && 
+                             product.stock !== null && 
+                             product.stock !== '';
+        
+        if (!hasValidStock) {
+          // Update product to have stock = 0
+          const docRef = doc(db, 'products', product.id);
+          await updateDoc(docRef, {
+            stock: 0,
+            updatedAt: new Date().toISOString()
+          });
+          
+          results.push({
+            id: product.id,
+            name: product.name,
+            oldStock: product.stock,
+            newStock: 0
+          });
+          updatedCount++;
+        } else {
+          // Ensure stock is a number
+          const numericStock = Number(product.stock);
+          if (product.stock !== numericStock) {
+            const docRef = doc(db, 'products', product.id);
+            await updateDoc(docRef, {
+              stock: numericStock,
+              updatedAt: new Date().toISOString()
+            });
+            
+            results.push({
+              id: product.id,
+              name: product.name,
+              oldStock: product.stock,
+              newStock: numericStock,
+              type: 'converted'
+            });
+            updatedCount++;
+          } else {
+            alreadySyncedCount++;
+          }
+        }
+      }
+
+      return {
+        success: true,
+        totalProducts: products.length,
+        updatedCount,
+        alreadySyncedCount,
+        results
+      };
+    } catch (error) {
+      console.error('Error syncing product stock:', error);
       throw error;
     }
   }

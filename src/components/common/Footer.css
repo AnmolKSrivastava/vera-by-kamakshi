@@ -220,7 +220,7 @@
   opacity: 0.9;
 }
 
-.badge {
+.footer-badge {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -234,11 +234,11 @@
   min-height: 52px;
 }
 
-.badge + .badge {
+.footer-badge + .footer-badge {
   border-left: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.badge-icon {
+.footer-badge-icon {
   width: 24px;
   height: 24px;
   display: inline-flex;
@@ -257,13 +257,13 @@
   stroke-linejoin: round;
 }
 
-.badge-copy {
+.footer-badge-copy {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
 }
 
-.badge-title {
+.footer-badge-title {
   font-size: 0.82rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.92);
@@ -271,7 +271,7 @@
   text-transform: uppercase;
 }
 
-.badge-subtitle {
+.footer-badge-subtitle {
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.58);
 }
@@ -386,7 +386,7 @@
     width: 100%;
   }
 
-  .badge {
+  .footer-badge {
     width: min(100%, 320px);
     min-width: 0;
     padding: 0;
@@ -395,7 +395,7 @@
     min-height: 44px;
   }
 
-  .badge + .badge {
+  .footer-badge + .footer-badge {
     border-left: none;
   }
 

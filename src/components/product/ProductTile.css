@@ -33,6 +33,41 @@
 }
 
 /* ========================================
+   OUT OF STOCK STYLING
+   ======================================== */
+
+.product-tile.out-of-stock {
+  opacity: 0.6 !important;
+  filter: grayscale(30%);
+}
+
+.product-tile.out-of-stock:hover {
+  opacity: 0.7 !important;
+  transform: translateY(-2px);
+}
+
+.product-tile.out-of-stock .product-image {
+  opacity: 0.85;
+}
+
+/* Keep badges visible on out-of-stock items */
+.product-tile.out-of-stock .product-badges {
+  opacity: 1;
+  filter: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
    IMAGE CONTAINER WITH ZOOM EFFECT
    ======================================== */
 
@@ -295,10 +330,10 @@
    ======================================== */
 
 .product-info {
-  padding: 1.5rem;
+  padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
   background: white;
 }
 
@@ -307,8 +342,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.25rem;
-  font-size: 0.85rem;
+  margin-bottom: 0;
+  font-size: 0.8rem;
   color: #666;
   letter-spacing: 0.01em;
 }
@@ -320,7 +355,7 @@
 
 .star {
   color: #ddd;
-  font-size: 1rem;
+  font-size: 0.9rem;
   line-height: 1;
 }
 
@@ -330,7 +365,7 @@
 }
 
 .rating-text {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #666;
   font-weight: 500;
   margin-left: 0.25rem;
@@ -338,11 +373,11 @@
 
 /* Product Name */
 .product-name {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 400;
   color: #2c2c2c;
   font-family: 'Playfair Display', serif;
-  line-height: 1.5;
+  line-height: 1.4;
   letter-spacing: 0.02em;
   margin: 0;
   overflow: hidden;
@@ -350,14 +385,14 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  min-height: 3rem;
+  min-height: 2.8rem;
 }
 
 /* Pricing Section */
 .product-pricing {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.25rem;
 }
 
 .price-row {
@@ -367,7 +402,7 @@
 }
 
 .current-price {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 500;
   color: #2c2c2c;
   font-family: 'Playfair Display', serif;
@@ -375,7 +410,7 @@
 }
 
 .original-price {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: #999;
   text-decoration: line-through;
   font-weight: 400;
@@ -395,12 +430,12 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  margin-top: 0.25rem;
+  margin-top: 0;
 }
 
 .color-dot {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 1.5px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -453,6 +488,15 @@
     padding: 0.6rem 1rem;
     font-size: 0.85rem;
   }
+  
+  .sold-out-message svg {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .sold-out-message span {
+    font-size: 1.1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -494,5 +538,15 @@
   .product-tile-wishlist-btn svg {
     width: 16px;
     height: 16px;
+  }
+  
+  .sold-out-message svg {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .sold-out-message span {
+    font-size: 0.95rem;
+    letter-spacing: 0.12em;
   }
 }

@@ -1,13 +1,13 @@
 .search-suggestions {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 3.5rem);
   right: 0;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   min-width: 320px;
   max-width: 400px;
-  z-index: 1003;
+  z-index: 1001;
   animation: suggestionsSlideIn 0.2s ease-out;
   overflow: hidden;
 }
@@ -161,11 +161,12 @@
 }
 
 /* Mobile Responsive */
-@media (max-width: 600px) {
+@media (max-width: 767px) {
   .search-suggestions {
-    min-width: 280px;
-    max-width: 90vw;
-    right: -1rem;
+    min-width: 260px;
+    max-width: calc(100vw - 1.5rem);
+    right: -0.75rem;
+    top: calc(100% + 3rem);
   }
 
   .suggestion-item {
@@ -183,5 +184,12 @@
 
   .suggestion-price {
     font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .search-suggestions {
+    min-width: 240px;
+    right: -0.5rem;
   }
 }

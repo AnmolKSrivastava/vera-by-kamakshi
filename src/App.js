@@ -1,7 +1,6 @@
 
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
 
 // Context Providers
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -49,13 +48,12 @@ function AppShellFallback() {
 function AppContent() {
   const location = useLocation();
   const isAdminPage = location.pathname === '/admin';
-  const [loginOpen, setLoginOpen] = useState(false);
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, loading, loginModalOpen, openLoginModal, closeLoginModal } = useAuth();
   
   return (
     <div className="app-layout">
       <SeoManager />
-      {!isAdminPage && <Header onLoginClick={() => setLoginOpen(true)} />}
+      {!isAdminPage && <Header onLoginClick={openLoginModal} />}
       <div className={`app-content ${isAdminPage ? 'no-header' : ''}`}>
         <Suspense fallback={<AppShellFallback />}>
           <Routes>
@@ -93,9 +91,9 @@ function AppContent() {
         </Suspense>
       </div>
       {!isAdminPage && <Footer />}
-      {loginOpen && (
+      {loginModalOpen && (
         <Suspense fallback={null}>
-          <UserLogin isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+          <UserLogin isOpen={loginModalOpen} onClose={closeLoginModal} />
         </Suspense>
       )}
     </div>

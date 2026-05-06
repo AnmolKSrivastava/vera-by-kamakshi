@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import './ContentPages.css';
+import './ContactUs.css';
+import instagramIcon from '../assets/Socials/instagram.svg';
+import facebookIcon from '../assets/Socials/facebook.svg';
+import xIcon from '../assets/Socials/X.svg';
+import pinterestIcon from '../assets/Socials/Pintrest.svg';
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -56,14 +60,19 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="content-page">
-      <div className="content-container">
-        <h1 className="page-title">Contact Us</h1>
-        <p className="page-intro">
-          We'd love to hear from you! Whether you have a question about our products, 
-          need assistance with your order, or just want to say hello, we're here to help.
-        </p>
+    <div className="contact-page">
+      {/* Hero Section */}
+      <section className="contact-hero">
+        <div className="contact-hero-content">
+          <h1>Contact Us</h1>
+          <p className="contact-hero-tagline">
+            We're Here to Help
+          </p>
+        </div>
+      </section>
 
+      {/* Main Content */}
+      <div className="contact-content">
         <div className="contact-layout">
           {/* Contact Form */}
           <div className="contact-form-section">
@@ -152,10 +161,8 @@ const ContactUs = () => {
 
           {/* Contact Information */}
           <div className="contact-info-section">
-            <h2>Get in Touch</h2>
-            
             <div className="contact-info-card">
-              <div className="info-icon">📧</div>
+              <div className="info-icon">✉</div>
               <div className="info-content">
                 <h3>Email</h3>
                 <a href="mailto:support@verabykamakshi.com">support@verabykamakshi.com</a>
@@ -163,7 +170,7 @@ const ContactUs = () => {
             </div>
 
             <div className="contact-info-card">
-              <div className="info-icon">📱</div>
+              <div className="info-icon">☎</div>
               <div className="info-content">
                 <h3>Phone</h3>
                 <a href="tel:+919876543210">+91 98765 43210</a>
@@ -172,7 +179,7 @@ const ContactUs = () => {
             </div>
 
             <div className="contact-info-card">
-              <div className="info-icon">📍</div>
+              <div className="info-icon">◉</div>
               <div className="info-content">
                 <h3>Address</h3>
                 <p>
@@ -185,7 +192,7 @@ const ContactUs = () => {
             </div>
 
             <div className="contact-info-card">
-              <div className="info-icon">🕐</div>
+              <div className="info-icon">◷</div>
               <div className="info-content">
                 <h3>Business Hours</h3>
                 <p>
@@ -198,10 +205,18 @@ const ContactUs = () => {
             <div className="social-links">
               <h3>Follow Us</h3>
               <div className="social-icons">
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">📷</a>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">📘</a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">🐦</a>
-                <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Pinterest">📌</a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <img src={instagramIcon} alt="Instagram" />
+                </a>
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                  <img src={facebookIcon} alt="Facebook" />
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                  <img src={xIcon} alt="X (Twitter)" />
+                </a>
+                <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Pinterest">
+                  <img src={pinterestIcon} alt="Pinterest" />
+                </a>
               </div>
             </div>
           </div>

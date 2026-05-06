@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [profileComplete, setProfileComplete] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
     // Subscribe to auth state changes
@@ -136,6 +137,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  /**
+   * Open login modal
+   */
+  const openLoginModal = () => {
+    setLoginModalOpen(true);
+  };
+
+  /**
+   * Close login modal
+   */
+  const closeLoginModal = () => {
+    setLoginModalOpen(false);
+  };
+
   const value = {
     user,
     userProfile,
@@ -143,6 +158,9 @@ export const AuthProvider = ({ children }) => {
     profileComplete,
     loading,
     error,
+    loginModalOpen,
+    openLoginModal,
+    closeLoginModal,
     signInWithGoogle,
     signInWithPhone,
     verifyOTP,

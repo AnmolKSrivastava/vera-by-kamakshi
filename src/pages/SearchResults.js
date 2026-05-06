@@ -110,7 +110,7 @@ function SearchResults() {
         ) : (
           <div className="search-results-grid">
             {products.map((product) => (
-              <ProductTile key={product.id} product={product} />
+              <ProductTile key={product.id} {...product} product={product} />
             ))}
           </div>
         )}

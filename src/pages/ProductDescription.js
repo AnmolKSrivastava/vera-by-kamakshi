@@ -4,8 +4,10 @@ import "./ProductDescription.css";
 import { useProduct } from "../hooks/useProducts";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
+import { useAuth } from "../context/AuthContext";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorMessage from "../components/common/ErrorMessage";
+import ActionModal from "../components/common/ActionModal";
 import { formatPrice } from "../utils/formatters";
 import { getDeliveryEstimate, addToRecentlyViewed } from "../utils/helpers";
 import ImageGallery from "../components/product/ImageGallery";
@@ -19,11 +21,18 @@ const ProductDescription = () => {
   const { product, loading, error, refetch } = useProduct(id);
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { openLoginModal } = useAuth();
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'default'
+  });
 
   // Handle scroll for sticky add-to-cart bar
   useEffect(() => {
@@ -53,9 +62,11 @@ const ProductDescription = () => {
   }, [id]);
 
   // Calculate stock status early for use in SEO metadata
-  const stock = Number(product?.stock) || 0;
-  const isLowStock = stock > 0 && stock <= 10;
-  const isOutOfStock = stock === 0;
+  const hasStockData = product?.stock !== undefined && product?.stock !== null && product?.stock !== '';
+  const stock = hasStockData ? Number(product.stock) : null;
+  const isAvailable = product?.available !== undefined ? product.available : true; // Default to available
+  const isLowStock = hasStockData && stock > 0 && stock <= 10;
+  const isOutOfStock = (hasStockData && stock === 0) || isAvailable === false;
 
   // Memoize product images array to prevent unnecessary re-renders
   const productImages = useMemo(() => {
@@ -180,20 +191,44 @@ const ProductDescription = () => {
   if (error) return <ErrorMessage error={error} onRetry={refetch} />;
   if (!product) return <ErrorMessage error="Product not found." />;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     const cartItem = {
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image,
+      image: product.image || product.imageUrl,
+      imageUrl: product.imageUrl || product.image,
       quantity: quantity,
+      stock: product.stock,
+      available: product.available,
       options: {
         ...(selectedColor && { color: selectedColor }),
         ...(selectedSize && { size: selectedSize })
       }
     };
     
-    addToCart(cartItem);
+    const result = await addToCart(cartItem);
+    if (!result.success) {
+      if (result.error === 'auth_required') {
+        openLoginModal();
+      } else if (result.error === 'out_of_stock') {
+        setStatusModal({
+          isOpen: true,
+          title: 'Out of Stock',
+          message: 'This item is currently out of stock.',
+          variant: 'danger'
+        });
+      } else if (result.error === 'insufficient_stock') {
+        setStatusModal({
+          isOpen: true,
+          title: 'Limited Stock',
+          message: `Only ${result.available} item(s) available right now.`,
+          variant: 'danger'
+        });
+      }
+      return;
+    }
+    
     setAddedToCart(true);
     
     // Reset after 2 seconds
@@ -208,7 +243,11 @@ const ProductDescription = () => {
   };
 
   const handleWishlistToggle = () => {
-    toggleWishlist(product);
+    const result = toggleWishlist(product);
+    if (result === false) {
+      // User not authenticated, show login modal
+      openLoginModal();
+    }
   };
 
   // Mock viewing count
@@ -218,7 +257,8 @@ const ProductDescription = () => {
   const deliveryEstimate = getDeliveryEstimate(3, 5);
 
   return (
-    <div className="product-description-page">
+    <>
+      <div className="product-description-page">
       <div className="product-desc-outer-container">
         {/* Image Gallery */}
         <div className="product-desc-image-section">
@@ -233,7 +273,19 @@ const ProductDescription = () => {
             onClick={handleWishlistToggle}
             aria-label={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
           >
-            {isInWishlist(product.id) ? '❤️' : '🤍'}
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="22" 
+              height="22" 
+              viewBox="0 0 24 24" 
+              fill={isInWishlist(product.id) ? '#ef5350' : 'none'}
+              stroke={isInWishlist(product.id) ? '#ef5350' : '#ef5350'}
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
           </button>
 
           <h1 className="product-desc-title">{product.name}</h1>
@@ -404,7 +456,19 @@ const ProductDescription = () => {
         category={product.category} 
         currentPrice={product.price}
       />
-    </div>
+
+      <ActionModal
+        isOpen={statusModal.isOpen}
+        title={statusModal.title}
+        message={statusModal.message}
+        confirmText="Close"
+        showCancel={false}
+        onConfirm={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        variant={statusModal.variant}
+      />
+      </div>
+    </>
   );
 };
 

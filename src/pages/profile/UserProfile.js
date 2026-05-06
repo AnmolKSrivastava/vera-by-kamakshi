@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
+import ActionModal from '../../components/common/ActionModal';
 import './UserProfile.css';
 
 const UserProfile = () => {
@@ -25,6 +26,13 @@ const UserProfile = () => {
   const [addresses, setAddresses] = useState([]);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [editingAddressIndex, setEditingAddressIndex] = useState(null);
+  const [confirmDeleteAddressIndex, setConfirmDeleteAddressIndex] = useState(null);
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'default'
+  });
   const [addressForm, setAddressForm] = useState({
     name: '',
     phone: '+91',
@@ -81,10 +89,20 @@ const UserProfile = () => {
         updatedAt: new Date().toISOString()
       });
       setIsEditingProfile(false);
-      alert('Profile updated successfully!');
+      setStatusModal({
+        isOpen: true,
+        title: 'Profile Updated',
+        message: 'Your profile was updated successfully.',
+        variant: 'success'
+      });
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Failed to update profile');
+      setStatusModal({
+        isOpen: true,
+        title: 'Update Failed',
+        message: 'Failed to update profile.',
+        variant: 'danger'
+      });
     } finally {
       setSaving(false);
     }
@@ -119,7 +137,12 @@ const UserProfile = () => {
   const handleSaveAddress = async () => {
     if (!addressForm.name || !addressForm.phone || !addressForm.addressLine1 || 
         !addressForm.city || !addressForm.state || !addressForm.pincode) {
-      alert('Please fill all required fields');
+      setStatusModal({
+        isOpen: true,
+        title: 'Missing Information',
+        message: 'Please fill all required fields.',
+        variant: 'danger'
+      });
       return;
     }
 
@@ -148,10 +171,20 @@ const UserProfile = () => {
 
       setAddresses(updatedAddresses);
       resetAddressForm();
-      alert(editingAddressIndex !== null ? 'Address updated!' : 'Address added!');
+      setStatusModal({
+        isOpen: true,
+        title: editingAddressIndex !== null ? 'Address Updated' : 'Address Added',
+        message: editingAddressIndex !== null ? 'Your address was updated successfully.' : 'Your address was added successfully.',
+        variant: 'success'
+      });
     } catch (error) {
       console.error('Error saving address:', error);
-      alert('Failed to save address');
+      setStatusModal({
+        isOpen: true,
+        title: 'Save Failed',
+        message: 'Failed to save address.',
+        variant: 'danger'
+      });
     } finally {
       setSaving(false);
     }
@@ -164,8 +197,6 @@ const UserProfile = () => {
   };
 
   const handleDeleteAddress = async (index) => {
-    if (!window.confirm('Are you sure you want to delete this address?')) return;
-
     setSaving(true);
     try {
       const updatedAddresses = addresses.filter((_, i) => i !== index);
@@ -175,12 +206,23 @@ const UserProfile = () => {
         updatedAt: new Date().toISOString()
       });
       setAddresses(updatedAddresses);
-      alert('Address deleted!');
+      setStatusModal({
+        isOpen: true,
+        title: 'Address Deleted',
+        message: 'The address was deleted successfully.',
+        variant: 'success'
+      });
     } catch (error) {
       console.error('Error deleting address:', error);
-      alert('Failed to delete address');
+      setStatusModal({
+        isOpen: true,
+        title: 'Delete Failed',
+        message: 'Failed to delete address.',
+        variant: 'danger'
+      });
     } finally {
       setSaving(false);
+      setConfirmDeleteAddressIndex(null);
     }
   };
 
@@ -199,7 +241,12 @@ const UserProfile = () => {
       setAddresses(updatedAddresses);
     } catch (error) {
       console.error('Error setting default address:', error);
-      alert('Failed to set default address');
+      setStatusModal({
+        isOpen: true,
+        title: 'Update Failed',
+        message: 'Failed to set default address.',
+        variant: 'danger'
+      });
     } finally {
       setSaving(false);
     }
@@ -492,7 +539,7 @@ const UserProfile = () => {
                         </button>
                         <button 
                           className="btn-delete-small" 
-                          onClick={() => handleDeleteAddress(index)}
+                          onClick={() => setConfirmDeleteAddressIndex(index)}
                         >
                           Delete
                         </button>
@@ -513,6 +560,29 @@ const UserProfile = () => {
           )}
         </div>
       </div>
+
+      <ActionModal
+        isOpen={confirmDeleteAddressIndex !== null}
+        title="Delete This Address?"
+        message="Are you sure you want to delete this address?"
+        confirmText="Delete Address"
+        cancelText="Keep Address"
+        onConfirm={() => handleDeleteAddress(confirmDeleteAddressIndex)}
+        onCancel={() => !saving && setConfirmDeleteAddressIndex(null)}
+        variant="danger"
+        loading={saving && confirmDeleteAddressIndex !== null}
+      />
+
+      <ActionModal
+        isOpen={statusModal.isOpen}
+        title={statusModal.title}
+        message={statusModal.message}
+        confirmText="Close"
+        showCancel={false}
+        onConfirm={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        variant={statusModal.variant}
+      />
     </div>
   );
 };

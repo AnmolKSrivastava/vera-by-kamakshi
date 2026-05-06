@@ -1,6 +1,7 @@
 // src/components/product/RecentlyViewed.js
 import React, { useState, useEffect } from 'react';
 import { getRecentlyViewed } from '../../utils/helpers';
+import { productService } from '../../services/productService';
 import ProductTile from './ProductTile';
 import './RecentlyViewed.css';
 
@@ -8,7 +9,9 @@ const RecentlyViewed = ({ currentProductId = null, limit = 8 }) => {
   const [recentProducts, setRecentProducts] = useState([]);
 
   useEffect(() => {
-    const loadRecentlyViewed = () => {
+    let isMounted = true;
+
+    const loadRecentlyViewed = async () => {
       let products = getRecentlyViewed();
       
       // Exclude current product if viewing product page
@@ -18,8 +21,22 @@ const RecentlyViewed = ({ currentProductId = null, limit = 8 }) => {
       
       // Limit the number shown
       products = products.slice(0, limit);
-      
-      setRecentProducts(products);
+
+      const hydratedProducts = await Promise.all(
+        products.map(async (product) => {
+          try {
+            const latestProduct = await productService.getById(product.id);
+            return latestProduct || product;
+          } catch (error) {
+            console.error(`Error loading recently viewed product ${product.id}:`, error);
+            return product;
+          }
+        })
+      );
+
+      if (isMounted) {
+        setRecentProducts(hydratedProducts);
+      }
     };
 
     loadRecentlyViewed();
@@ -28,6 +45,7 @@ const RecentlyViewed = ({ currentProductId = null, limit = 8 }) => {
     window.addEventListener('storage', loadRecentlyViewed);
     
     return () => {
+      isMounted = false;
       window.removeEventListener('storage', loadRecentlyViewed);
     };
   }, [currentProductId, limit]);

@@ -177,11 +177,11 @@ function Footer() {
           </div>
           <div className="trust-badges">
             {trustBadges.map((badge) => (
-              <span key={badge.title} className="badge">
-                <span className="badge-icon">{badge.icon}</span>
-                <span className="badge-copy">
-                  <span className="badge-title">{badge.title}</span>
-                  <span className="badge-subtitle">{badge.subtitle}</span>
+              <span key={badge.title} className="footer-badge">
+                <span className="footer-badge-icon">{badge.icon}</span>
+                <span className="footer-badge-copy">
+                  <span className="footer-badge-title">{badge.title}</span>
+                  <span className="footer-badge-subtitle">{badge.subtitle}</span>
                 </span>
               </span>
             ))}

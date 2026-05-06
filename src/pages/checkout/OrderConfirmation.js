@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import ActionModal from '../../components/common/ActionModal';
 import { getOrderById } from '../../services/orderService';
 import './OrderConfirmation.css';
+
+const getStoredCheckoutSuccess = () => {
+  try {
+    const storedValue = sessionStorage.getItem('checkoutSuccess');
+    return storedValue ? JSON.parse(storedValue) : null;
+  } catch (error) {
+    console.error('Error reading checkout success state:', error);
+    return null;
+  }
+};
 
 const OrderConfirmation = () => {
   const { orderId } = useParams();
@@ -9,8 +20,10 @@ const OrderConfirmation = () => {
   const location = useLocation();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [storedOrderDetails, setStoredOrderDetails] = useState(() => getStoredCheckoutSuccess());
   
-  const orderDetails = location.state?.orderDetails;
+  const orderDetails = location.state?.orderDetails || storedOrderDetails;
   
   useEffect(() => {
     if (orderId) {
@@ -20,6 +33,14 @@ const OrderConfirmation = () => {
         .finally(() => setLoading(false));
     }
   }, [orderId]);
+
+  useEffect(() => {
+    if (orderDetails?.orderId) {
+      setShowSuccessModal(true);
+      sessionStorage.removeItem('checkoutSuccess');
+      setStoredOrderDetails(null);
+    }
+  }, [orderDetails]);
   
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(price);
@@ -49,6 +70,29 @@ const OrderConfirmation = () => {
   return (
     <div className="order-confirmation-page">
       <div className="confirmation-container">
+        {/* Progress Indicator */}
+        <div className="checkout-progress">
+          <div className="progress-step completed">
+            <div className="step-number">1</div>
+            <div className="step-label">Shopping Cart</div>
+          </div>
+          <div className="progress-line completed"></div>
+          <div className="progress-step completed">
+            <div className="step-number">2</div>
+            <div className="step-label">Checkout</div>
+          </div>
+          <div className="progress-line completed"></div>
+          <div className="progress-step completed">
+            <div className="step-number">3</div>
+            <div className="step-label">Payment</div>
+          </div>
+          <div className="progress-line completed"></div>
+          <div className="progress-step active">
+            <div className="step-number">4</div>
+            <div className="step-label">Complete</div>
+          </div>
+        </div>
+        
         {/* Success Message */}
         <div className="success-section">
           <div className="success-icon">✓</div>
@@ -129,12 +173,18 @@ const OrderConfirmation = () => {
                   <span>{formatPrice(order.subtotal || order.totalAmount)}</span>
                 </div>
                 <div className="price-row">
-                  <span>Shipping:</span>
+                  <span>Shipping ({order.shippingMethod === 'express' ? 'Express 2-3 days' : 'Standard 5-7 days'}):</span>
                   <span>{order.shippingCost ? formatPrice(order.shippingCost) : 'FREE'}</span>
                 </div>
+                {order.giftWrap && (
+                  <div className="price-row">
+                    <span>Gift Wrap:</span>
+                    <span>{formatPrice(order.giftWrapCost || 99)}</span>
+                  </div>
+                )}
                 {order.discount > 0 && (
                   <div className="price-row discount">
-                    <span>Discount:</span>
+                    <span>Discount {order.couponCode && `(${order.couponCode})`}:</span>
                     <span>-{formatPrice(order.discount)}</span>
                   </div>
                 )}
@@ -143,6 +193,20 @@ const OrderConfirmation = () => {
                   <span><strong>{formatPrice(order.totalAmount)}</strong></span>
                 </div>
               </div>
+              
+              {/* Gift Message */}
+              {order.giftWrap && order.giftMessage && (
+                <div className="gift-message-display" style={{
+                  marginTop: '20px',
+                  padding: '15px',
+                  background: '#f0f9ff',
+                  borderLeft: '3px solid #3b82f6',
+                  borderRadius: '4px'
+                }}>
+                  <strong style={{color: '#1e40af'}}>Gift Message:</strong>
+                  <p style={{marginTop: '8px', color: '#374151'}}>{order.giftMessage}</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -195,6 +259,19 @@ const OrderConfirmation = () => {
             Contact Support
           </button>
         </div>
+
+        <ActionModal
+          isOpen={showSuccessModal}
+          title={orderDetails?.paymentMethod === 'COD' ? 'Order Placed Successfully' : 'Payment Successful'}
+          message={order
+            ? `Your order #${order.id.slice(0, 8).toUpperCase()} has been placed successfully.`
+            : 'Your order has been placed successfully.'}
+          confirmText="Continue"
+          showCancel={false}
+          onConfirm={() => setShowSuccessModal(false)}
+          onCancel={() => setShowSuccessModal(false)}
+          variant="success"
+        />
       </div>
     </div>
   );
