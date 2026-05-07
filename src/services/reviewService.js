@@ -6,7 +6,8 @@ import {
   getDoc, 
   query, 
   where, 
-  orderBy, 
+  orderBy,
+  limit,
   updateDoc,
   doc,
   increment,
@@ -165,6 +166,39 @@ const reviewService = {
   markReviewHelpful,
   getProductRating,
   hasUserPurchasedProduct
+};
+
+/**
+ * Get recent high-rated reviews across all products (for homepage)
+ * @param {number} limit - Max number of reviews to return (default 6)
+ * @param {number} minRating - Minimum star rating to include (default 4)
+ * @returns {Promise<Array>} Array of reviews
+ */
+export const getRecentReviews = async (maxResults = 6, minRating = 4) => {
+  try {
+    const reviewsQuery = query(
+      collection(db, REVIEWS_COLLECTION),
+      where('rating', '>=', minRating),
+      orderBy('rating', 'desc'),
+      limit(maxResults)
+    );
+
+    const querySnapshot = await getDocs(reviewsQuery);
+    const reviews = [];
+
+    querySnapshot.forEach((docSnap) => {
+      reviews.push({
+        id: docSnap.id,
+        ...docSnap.data(),
+        createdAt: docSnap.data().createdAt?.toDate(),
+      });
+    });
+
+    return reviews;
+  } catch (error) {
+    console.error('Error fetching recent reviews:', error);
+    return [];
+  }
 };
 
 export default reviewService;

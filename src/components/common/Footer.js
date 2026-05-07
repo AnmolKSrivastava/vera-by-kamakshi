@@ -9,6 +9,7 @@ import visaIcon from '../../assets/Payment/visa.svg';
 import mastercardIcon from '../../assets/Payment/mastercard.svg';
 import googlePayIcon from '../../assets/Payment/google-pay.svg';
 import cashOnDeliveryIcon from '../../assets/Payment/cash-on-delivery.svg';
+import xsavLogo from '../../assets/Logo/xsav_lab_logo.webp';
 
 const socialLinks = [
   {
@@ -87,6 +88,11 @@ const trustBadges = [
     ),
   },
 ];
+
+const poweredBy = {
+  label: 'XSAV Lab',
+  website: 'https://xsavlab.com/',
+};
 
 function Footer() {
   return (
@@ -175,7 +181,7 @@ function Footer() {
               ))}
             </div>
           </div>
-          <div className="trust-badges">
+          <div className="footer-trust-badges">
             {trustBadges.map((badge) => (
               <span key={badge.title} className="footer-badge">
                 <span className="footer-badge-icon">{badge.icon}</span>
@@ -186,6 +192,20 @@ function Footer() {
               </span>
             ))}
           </div>
+          <a
+            href={poweredBy.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-powered-by"
+            aria-label={`Powered by ${poweredBy.label}`}
+          >
+            <span className="footer-powered-label">Powered by</span>
+            <span className="footer-powered-logo" aria-hidden="true">
+              <img src={xsavLogo} alt="" className="footer-powered-logo-image" />
+            </span>
+            <span className="footer-powered-brand">{poweredBy.label}</span>
+            
+          </a>
           <p className="copyright">© 2026 VERA by Kamakshi. All rights reserved.</p>
         </div>
       </div>

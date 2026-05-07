@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Home.css';
 import ProductTile from '../components/product/ProductTile';
 import RecentlyViewed from '../components/product/RecentlyViewed';
@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useFeaturedProducts } from '../hooks/useProducts';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
+import { getRecentReviews } from '../services/reviewService';
 import useScrollReveal from '../hooks/useScrollReveal';
 
 function NewArrivals() {
@@ -41,30 +42,15 @@ function NewArrivals() {
 
 function Testimonials() {
   const [sectionRef, isVisible] = useScrollReveal();
-  
-  const testimonials = [
-    {
-      name: 'Priya Sharma',
-      location: 'Mumbai',
-      rating: 5,
-      text: 'Absolutely in love with my new handbag! The quality is exceptional and the craftsmanship is evident in every detail. Worth every penny!',
-      image: '👩🏻'
-    },
-    {
-      name: 'Ananya Desai',
-      location: 'Delhi',
-      rating: 5,
-      text: 'VERA by Kamakshi has become my go-to for luxury bags. The leather is genuine, the designs are timeless, and the service is impeccable.',
-      image: '👩🏽'
-    },
-    {
-      name: 'Sakshi Patel',
-      location: 'Bangalore',
-      rating: 5,
-      text: 'I received so many compliments on my clutch! The attention to detail and the elegant design make it perfect for any occasion.',
-      image: '👩🏻‍🦱'
-    }
-  ];
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getRecentReviews(3, 4)
+      .then(setReviews)
+      .catch(() => setReviews([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <section 
@@ -75,23 +61,34 @@ function Testimonials() {
         <h2 className="home-section-title">WHAT OUR CUSTOMERS SAY</h2>
         <p className="home-section-subtitle">Real reviews from real customers</p>
       </div>
-      <div className={`testimonials-grid scroll-reveal-stagger ${isVisible ? 'is-visible' : ''}`}>
-        {testimonials.map((testimonial, index) => (
-          <div key={index} className="testimonial-card">
-            <div className="testimonial-rating">
-              {'⭐'.repeat(testimonial.rating)}
-            </div>
-            <p className="testimonial-text">"{testimonial.text}"</p>
-            <div className="testimonial-author">
-              <div className="testimonial-avatar">{testimonial.image}</div>
-              <div className="testimonial-info">
-                <h4 className="testimonial-name">{testimonial.name}</h4>
-                <p className="testimonial-location">{testimonial.location}</p>
+
+      {loading ? (
+        <LoadingSpinner message="Loading reviews..." />
+      ) : reviews.length === 0 ? (
+        <p className="testimonials-empty">No reviews yet. Be the first to share your experience!</p>
+      ) : (
+        <div className={`testimonials-grid scroll-reveal-stagger ${isVisible ? 'is-visible' : ''}`}>
+          {reviews.map((review) => (
+            <div key={review.id} className="testimonial-card">
+              <div className="testimonial-rating">
+                {'⭐'.repeat(review.rating)}
+              </div>
+              <p className="testimonial-text">"{review.text}"</p>
+              <div className="testimonial-author">
+                <div className="testimonial-avatar">
+                  {review.userName ? review.userName.charAt(0).toUpperCase() : '?'}
+                </div>
+                <div className="testimonial-info">
+                  <h4 className="testimonial-name">{review.userName || 'Anonymous'}</h4>
+                  {review.verified && (
+                    <p className="testimonial-location">Verified Purchase</p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
